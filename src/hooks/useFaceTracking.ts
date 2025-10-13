@@ -87,6 +87,14 @@ export const useFaceTracking = () => {
           // Combined head tilt metric
           const totalHeadTilt = Math.sqrt(horizontalTilt * horizontalTilt + verticalTilt * verticalTilt);
           
+          // Debug logging
+          console.log('Face metrics:', {
+            avgEyeOpenness: avgEyeOpenness.toFixed(3),
+            horizontalTilt: horizontalTilt.toFixed(3),
+            verticalTilt: verticalTilt.toFixed(3),
+            totalHeadTilt: totalHeadTilt.toFixed(3)
+          });
+          
           // Eyes open and facing camera = high focus
           if (avgEyeOpenness > 0.08 && totalHeadTilt < 0.4) {
             currentFocus = 95;
@@ -99,6 +107,8 @@ export const useFaceTracking = () => {
           } else {
             currentFocus = 30; // Eyes closed or looking away
           }
+          
+          console.log('Focus calculated:', currentFocus);
         }
         
         focusHistoryRef.current.push(currentFocus);
