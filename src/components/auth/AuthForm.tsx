@@ -132,14 +132,17 @@ export const AuthForm = () => {
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? 'Loading...' : isLogin ? 'Sign In' : 'Sign Up'}
           </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            className="w-full"
-            onClick={() => setIsLogin(!isLogin)}
-          >
-            {isLogin ? "Sign up" : 'Sign in'}
-          </Button>
+          <div className="text-center text-sm text-muted-foreground">
+            {isLogin ? "Don't have an account? " : 'Already have an account? '}
+            <Button
+              type="button"
+              variant="link"
+              className="p-0 h-auto font-normal"
+              onClick={() => setIsLogin(!isLogin)}
+            >
+              {isLogin ? "Sign up" : 'Sign in'}
+            </Button>
+          </div>
         </form>
       </CardContent>
     </Card>
