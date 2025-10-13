@@ -65,24 +65,28 @@ export const useFaceTracking = () => {
         if (faceDetected) {
           const landmarks = results.multiFaceLandmarks[0];
           
-          // Get eye landmarks (left eye: 33, right eye: 263)
+          // Calculate face size (distance between eyes) for normalization
           const leftEye = landmarks[33];
           const rightEye = landmarks[263];
+          const eyeDistance = Math.sqrt(
+            Math.pow(rightEye.x - leftEye.x, 2) + 
+            Math.pow(rightEye.y - leftEye.y, 2)
+          );
           
-          // Calculate eye openness (vertical distance between upper and lower eyelid)
-          const leftEyeOpenness = Math.abs(landmarks[159].y - landmarks[145].y);
-          const rightEyeOpenness = Math.abs(landmarks[386].y - landmarks[374].y);
+          // Calculate eye openness normalized by face size
+          const leftEyeOpenness = Math.abs(landmarks[159].y - landmarks[145].y) / eyeDistance;
+          const rightEyeOpenness = Math.abs(landmarks[386].y - landmarks[374].y) / eyeDistance;
           const avgEyeOpenness = (leftEyeOpenness + rightEyeOpenness) / 2;
           
-          // Calculate head pose (check if facing camera)
+          // Calculate head pose normalized by face size
           const noseTip = landmarks[1];
           const faceCenter = landmarks[168];
-          const headTilt = Math.abs(noseTip.x - faceCenter.x);
+          const headTilt = Math.abs(noseTip.x - faceCenter.x) / eyeDistance;
           
           // Eyes open and facing camera = high focus
-          if (avgEyeOpenness > 0.015 && headTilt < 0.1) {
+          if (avgEyeOpenness > 0.08 && headTilt < 0.5) {
             currentFocus = 95;
-          } else if (avgEyeOpenness > 0.01) {
+          } else if (avgEyeOpenness > 0.05) {
             currentFocus = 70; // Eyes open but not fully engaged
           } else {
             currentFocus = 40; // Eyes closed or looking away
