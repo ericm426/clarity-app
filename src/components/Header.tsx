@@ -36,20 +36,12 @@ const Header = () => {
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-8">
-          <h1 
-            className="text-2xl font-headline font-bold text-foreground cursor-pointer"
-            onClick={() => navigate('/')}
-          >
-            Clarity
-          </h1>
-          <button
-            onClick={handleDashboardClick}
-            className="text-sm font-body font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Dashboard
-          </button>
-        </div>
+        <h1 
+          className="text-2xl font-headline font-bold text-foreground cursor-pointer"
+          onClick={() => navigate('/')}
+        >
+          Clarity
+        </h1>
 
         <div className="flex items-center gap-3">
           {user ? (
