@@ -70,7 +70,7 @@ const Track = () => {
         setLowFocusDuration((prevDuration) => {
           const newDuration = prevDuration + 1;
           // Trigger nudge at 30 seconds
-          if (newDuration >= 2) {
+          if (newDuration >= 5) {
             setShowNudge(true);
             setNudgeCount((count) => count + 1);
             return 0; // Reset after nudge
