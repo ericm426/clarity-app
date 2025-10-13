@@ -66,11 +66,11 @@ const Track = () => {
       setFocusLevels((prev) => [...prev, currentFocus]);
 
       // Track low focus duration
-      if (currentFocus < 50) {
+      if (currentFocus < 60) {
         setLowFocusDuration((prevDuration) => {
           const newDuration = prevDuration + 1;
           // Trigger nudge at 30 seconds
-          if (newDuration >= 5) {
+          if (newDuration >= 2) {
             setShowNudge(true);
             setNudgeCount((count) => count + 1);
             return 0; // Reset after nudge
