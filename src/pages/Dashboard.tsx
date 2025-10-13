@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import Header from '@/components/Header';
+import { Profile } from '@/components/Profile';
+import { FindFriends } from '@/components/FindFriends';
+import { FriendProfile } from '@/components/FriendProfile';
 import { 
   ArrowUp, 
   ArrowDown, 
@@ -39,6 +43,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
+  const [viewingFriendId, setViewingFriendId] = useState<string | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -172,20 +177,39 @@ const Dashboard = () => {
   const dailyData = getDailyBreakdown();
   const hourlyData = getHourlyHeatmap();
 
+  if (viewingFriendId) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <Header />
+        <main className="container mx-auto px-6 py-8 flex-1 max-w-7xl">
+          <FriendProfile userId={viewingFriendId} onBack={() => setViewingFriendId(null)} />
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
       
       <main className="container mx-auto px-6 py-8 flex-1 max-w-7xl">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-headline font-bold text-foreground mb-2">
-            Attention Metrics
-          </h1>
-          <p className="text-sm font-body text-muted-foreground uppercase tracking-wide">
-            Last 7 Days
-          </p>
-        </div>
+        <Tabs defaultValue="dashboard" className="w-full">
+          <TabsList className="mb-8">
+            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+            <TabsTrigger value="profile">Profile</TabsTrigger>
+            <TabsTrigger value="friends">Find Friends</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="dashboard">
+            {/* Header */}
+            <div className="mb-8">
+              <h1 className="text-3xl font-headline font-bold text-foreground mb-2">
+                Attention Metrics
+              </h1>
+              <p className="text-sm font-body text-muted-foreground uppercase tracking-wide">
+                Last 7 Days
+              </p>
+            </div>
 
         {/* 3-Column Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -385,17 +409,27 @@ const Dashboard = () => {
           </div>
         </Card>
 
-        {/* Action Buttons */}
-        <div className="flex flex-wrap gap-4">
-          <Button
-            onClick={() => navigate('/track')}
-            size="lg"
-            className="font-body font-medium px-6"
-          >
-            <Play className="w-4 h-4 mr-2" />
-            Start Session
-          </Button>
-        </div>
+            {/* Action Buttons */}
+            <div className="flex flex-wrap gap-4">
+              <Button
+                onClick={() => navigate('/track')}
+                size="lg"
+                className="font-body font-medium px-6"
+              >
+                <Play className="w-4 h-4 mr-2" />
+                Start Session
+              </Button>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="profile">
+            <Profile />
+          </TabsContent>
+
+          <TabsContent value="friends">
+            <FindFriends onViewProfile={setViewingFriendId} />
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
