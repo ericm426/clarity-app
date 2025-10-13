@@ -115,35 +115,50 @@ export const useFaceTracking = () => {
             lookingDownDurationRef.current = 0; // Reset if looking up
           }
           
-          // Calculate individual angle penalties with stricter thresholds
-          const pitchScore = Math.max(0, 1 - Math.abs(headPose.pitch) / 35);  // ±35° tolerance
-          const yawScore = Math.max(0, 1 - Math.abs(headPose.yaw) / 40);      // ±40° tolerance
-          const rollScore = Math.max(0, 1 - Math.abs(headPose.roll) / 30);    // ±30° tolerance
+          // Calculate focus score based on head direction
+          // Forward (good posture): 80-100%
+          // Sideways (yaw): 45-70%
+          // Down (pitch): Heavy penalty, 25-50%
           
-          // Extra penalty for looking to the side or down
-          let sidePenalty = 0;
-          if (Math.abs(headPose.yaw) > 25) {
-            sidePenalty = 0.15; // 15% penalty for looking to side
-          }
+          const absPitch = Math.abs(headPose.pitch);
+          const absYaw = Math.abs(headPose.yaw);
+          const absRoll = Math.abs(headPose.roll);
           
-          let downPenalty = 0;
+          // Start with perfect score
+          let score = 100;
+          
+          // Apply pitch penalty (up/down movement)
+          // Looking down is particularly problematic (distraction indicator)
           if (headPose.pitch > 15) {
-            downPenalty = 0.10; // 10% base penalty for looking down
+            // Looking down: heavy penalty
+            const downAmount = Math.min(headPose.pitch, 45) / 45; // 0-1 scale
+            score -= downAmount * 50; // Up to -50 points for looking down
             
-            // Additional penalty if looking down for extended period (10-15+ seconds = 300-450 frames at 30fps)
+            // Extra penalty for sustained downward gaze (10-15+ seconds)
             if (lookingDownDurationRef.current > 300) {
-              downPenalty += 0.20; // Extra 20% penalty for sustained downward gaze
+              score -= 15; // Additional -15 points
             }
+          } else if (absPitch > 15) {
+            // Looking up: moderate penalty
+            const upAmount = Math.min(absPitch, 35) / 35;
+            score -= upAmount * 25; // Up to -25 points
           }
           
-          const headAlignmentScore = Math.max(0, (pitchScore + yawScore + rollScore) / 3 - sidePenalty - downPenalty);
+          // Apply yaw penalty (left/right movement)
+          if (absYaw > 10) {
+            // Sideways: should result in 45-70% range
+            const sidewaysAmount = Math.min(absYaw, 50) / 50; // 0-1 scale
+            score -= sidewaysAmount * 40; // Up to -40 points for looking sideways
+          }
           
-          // Convert alignment score to focus percentage
-          // Map 0-1 alignment to 30-95% focus with better distribution
-          currentFocus = Math.round(30 + headAlignmentScore * 65);
+          // Apply roll penalty (head tilt)
+          if (absRoll > 15) {
+            const tiltAmount = Math.min(absRoll, 40) / 40;
+            score -= tiltAmount * 20; // Up to -20 points
+          }
           
           // Clamp to valid range
-          currentFocus = Math.max(25, Math.min(95, currentFocus));
+          currentFocus = Math.round(Math.max(25, Math.min(100, score)));
         } else {
           lookingDownDurationRef.current = 0; // Reset when face not detected
         }
