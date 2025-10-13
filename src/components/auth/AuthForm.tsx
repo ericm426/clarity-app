@@ -1,18 +1,18 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 export const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [username, setUsername] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -30,8 +30,8 @@ export const AuthForm = () => {
 
         if (error) throw error;
 
-        toast.success('Welcome back!');
-        navigate('/track');
+        toast.success("Welcome back!");
+        navigate("/dashboard");
       } else {
         const { data, error } = await supabase.auth.signUp({
           email,
@@ -41,17 +41,17 @@ export const AuthForm = () => {
         if (error) throw error;
 
         if (data.user) {
-          await supabase.from('profiles').insert({
+          await supabase.from("profiles").insert({
             user_id: data.user.id,
-            display_name: displayName || email.split('@')[0],
+            display_name: displayName || email.split("@")[0],
           });
 
-          toast.success('Account created! Redirecting...');
-          navigate('/track');
+          toast.success("Account created! Redirecting...");
+          navigate("/dashboard");
         }
       }
     } catch (error: any) {
-      toast.error(error.message || 'An error occurred');
+      toast.error(error.message || "An error occurred");
     } finally {
       setLoading(false);
     }
@@ -60,11 +60,9 @@ export const AuthForm = () => {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>{isLogin ? 'Welcome Back' : 'Create Account'}</CardTitle>
+        <CardTitle>{isLogin ? "Welcome Back" : "Create Account"}</CardTitle>
         <CardDescription>
-          {isLogin
-            ? 'Sign in to access your mindful focus sessions'
-            : 'Start your journey to better focus'}
+          {isLogin ? "Sign in to access your mindful focus sessions" : "Start your journey to better focus"}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -130,17 +128,17 @@ export const AuthForm = () => {
             </div>
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Loading...' : isLogin ? 'Sign In' : 'Sign Up'}
+            {loading ? "Loading..." : isLogin ? "Sign In" : "Sign Up"}
           </Button>
           <div className="text-center text-sm text-muted-foreground">
-            {isLogin ? "Don't have an account? " : 'Already have an account? '}
+            {isLogin ? "Don't have an account? " : "Already have an account? "}
             <Button
               type="button"
               variant="link"
               className="p-0 h-auto font-normal"
               onClick={() => setIsLogin(!isLogin)}
             >
-              {isLogin ? "Sign up" : 'Sign in'}
+              {isLogin ? "Sign up" : "Sign in"}
             </Button>
           </div>
         </form>
