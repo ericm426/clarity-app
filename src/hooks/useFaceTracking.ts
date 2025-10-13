@@ -59,7 +59,7 @@ export const useFaceTracking = () => {
       faceMesh.onResults((results) => {
         const faceDetected = results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0;
         
-        // Calculate focus level based on face detection and facial metrics
+        // Calculate focus level primarily based on face detection
         let currentFocus = 30; // Default low focus when no face
         
         if (faceDetected) {
@@ -73,17 +73,12 @@ export const useFaceTracking = () => {
             Math.pow(rightEye.y - leftEye.y, 2)
           );
           
-          // Calculate eye openness normalized by face size
-          const leftEyeOpenness = Math.abs(landmarks[159].y - landmarks[145].y) / eyeDistance;
-          const rightEyeOpenness = Math.abs(landmarks[386].y - landmarks[374].y) / eyeDistance;
-          const avgEyeOpenness = (leftEyeOpenness + rightEyeOpenness) / 2;
-          
           // Calculate head pose normalized by face size
-          const noseTip = landmarks[1];
-          const faceCenter = landmarks[168];
           // 3D head pose using depth (z) for yaw/pitch
           const leftEyeCorner = landmarks[33];
           const rightEyeCorner = landmarks[263];
+          const noseTip = landmarks[1];
+          const faceCenter = landmarks[168];
           const yaw = Math.abs(leftEyeCorner.z - rightEyeCorner.z) / eyeDistance; // left/right turn
           const pitch = Math.abs(noseTip.z - faceCenter.z) / eyeDistance; // up/down nod
 
@@ -91,23 +86,18 @@ export const useFaceTracking = () => {
 
           // Debug logging
           console.log('Face metrics:', {
-            avgEyeOpenness: avgEyeOpenness.toFixed(3),
             yaw: yaw.toFixed(3),
             pitch: pitch.toFixed(3),
             totalHeadMotion: totalHeadMotion.toFixed(3)
           });
           
-          // Eyes open and facing camera = high focus
-          if (avgEyeOpenness > 0.08 && totalHeadMotion < 0.3) {
-            currentFocus = 95;
-          } else if (avgEyeOpenness > 0.08 && totalHeadMotion < 0.5) {
-            currentFocus = 70; // Eyes open but slight head motion
-          } else if (avgEyeOpenness > 0.05 && totalHeadMotion < 0.5) {
-            currentFocus = 50; // Eyes somewhat closed or moderate head motion
-          } else if (totalHeadMotion >= 0.5) {
-            currentFocus = 30; // Head significantly turned or nodded away
+          // Focus based primarily on face presence, head turn affects minimally
+          if (totalHeadMotion < 0.6) {
+            currentFocus = 95; // Face visible, minimal to moderate turn
+          } else if (totalHeadMotion < 0.9) {
+            currentFocus = 70; // Face visible, significant turn
           } else {
-            currentFocus = 35; // Eyes closed or looking away
+            currentFocus = 40; // Face visible but turned ~90 degrees
           }
           
           console.log('Focus calculated:', currentFocus);
