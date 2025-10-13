@@ -34,20 +34,6 @@ export const useFaceTracking = () => {
     );
   };
 
-  // Calculate Eye Aspect Ratio (EAR)
-  // EAR = (||p2-p6|| + ||p3-p5||) / (2 * ||p1-p4||)
-  const calculateEAR = (eye: any[]): number => {
-    // Vertical distances
-    const vertical1 = calculateDistance(eye[1], eye[5]);
-    const vertical2 = calculateDistance(eye[2], eye[4]);
-    
-    // Horizontal distance
-    const horizontal = calculateDistance(eye[0], eye[3]);
-    
-    // EAR formula
-    return (vertical1 + vertical2) / (2.0 * horizontal);
-  };
-
   // Calculate head pose angles (pitch, yaw, roll) in degrees
   const calculateHeadPose = (landmarks: any): { pitch: number; yaw: number; roll: number } => {
     // Key facial landmarks for head pose
@@ -118,32 +104,6 @@ export const useFaceTracking = () => {
         if (faceDetected) {
           const landmarks = results.multiFaceLandmarks[0];
           
-          // MediaPipe Face Mesh eye landmark indices
-          // Left eye: 33 (left corner), 133 (right corner), 160, 159 (top), 144, 145 (bottom)
-          const leftEyePoints = [
-            landmarks[33],  // left corner
-            landmarks[160], // top 1
-            landmarks[159], // top 2
-            landmarks[133], // right corner
-            landmarks[145], // bottom 1
-            landmarks[144]  // bottom 2
-          ];
-          
-          // Right eye: 362 (right corner), 263 (left corner), 385, 387 (top), 373, 380 (bottom)
-          const rightEyePoints = [
-            landmarks[362], // right corner
-            landmarks[385], // top 1
-            landmarks[387], // top 2
-            landmarks[263], // left corner
-            landmarks[380], // bottom 1
-            landmarks[373]  // bottom 2
-          ];
-          
-          // Calculate EAR for both eyes
-          const leftEAR = calculateEAR(leftEyePoints);
-          const rightEAR = calculateEAR(rightEyePoints);
-          const avgEAR = (leftEAR + rightEAR) / 2;
-          
           // Calculate head pose angles
           const headPose = calculateHeadPose(landmarks);
           
@@ -154,21 +114,17 @@ export const useFaceTracking = () => {
           const rollScore = Math.max(0, 1 - Math.abs(headPose.roll) / 25);    // Allow ±25° before penalty
           const headAlignmentScore = (pitchScore + yawScore + rollScore) / 3;
           
-          // Classify focus based on EAR and head pose
-          // EAR > 0.25 = fully open eyes (alert)
-          // EAR 0.2-0.25 = partially open (drowsy)
-          // EAR < 0.2 = closed/blinking
-          
-          if (avgEAR > 0.25 && headAlignmentScore > 0.8) {
-            currentFocus = 95; // Fully engaged - eyes open + facing camera
-          } else if (avgEAR > 0.25 && headAlignmentScore > 0.6) {
-            currentFocus = 80; // Good focus - eyes open but slightly turned
-          } else if (avgEAR > 0.20 && headAlignmentScore > 0.5) {
-            currentFocus = 65; // Moderate - drowsy or looking away slightly
-          } else if (avgEAR > 0.15 && headAlignmentScore > 0.3) {
-            currentFocus = 45; // Low - very drowsy or looking away
+          // Focus based purely on head pose alignment
+          if (headAlignmentScore > 0.85) {
+            currentFocus = 95; // Facing camera directly
+          } else if (headAlignmentScore > 0.70) {
+            currentFocus = 80; // Slightly turned
+          } else if (headAlignmentScore > 0.50) {
+            currentFocus = 60; // Moderately turned away
+          } else if (headAlignmentScore > 0.30) {
+            currentFocus = 40; // Looking away significantly
           } else {
-            currentFocus = 25; // Minimal - eyes closed or head turned away
+            currentFocus = 25; // Head turned away from screen
           }
         }
         
