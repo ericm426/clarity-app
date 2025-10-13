@@ -4,6 +4,7 @@ import { FocusStats } from '@/components/FocusStats';
 import { NudgeAlert } from '@/components/NudgeAlert';
 import { CameraPreview } from '@/components/CameraPreview';
 import { SessionMetrics } from '@/components/SessionMetrics';
+import { ActiveSessionSidebar } from '@/components/ActiveSessionSidebar';
 import { useFaceTracking } from '@/hooks/useFaceTracking';
 import { Play, Square, BarChart3, Video } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -105,6 +106,10 @@ const Track = () => {
     }
   };
 
+  const handleTakeBreak = () => {
+    toast.info('Break started - session paused');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/80 flex flex-col">
       <Header />
@@ -124,47 +129,52 @@ const Track = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="track" className="flex flex-col items-center gap-16 mt-8">
-        {/* Camera Preview */}
-        {isTracking && stream && (
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-sm font-body text-muted-foreground mb-2">Camera Preview</p>
-            <CameraPreview stream={stream} />
-          </div>
-        )}
+          <TabsContent value="track" className="mt-8">
+            {/* Active Session Split Screen */}
+            {isTracking ? (
+              <div className="flex gap-8 max-w-7xl mx-auto">
+                {/* Left: Main Work Area */}
+                <div className="flex-1 space-y-6">
+                  {stream && (
+                    <div className="flex flex-col items-center gap-2">
+                      <p className="text-sm font-body text-muted-foreground mb-2">Camera Preview</p>
+                      <CameraPreview stream={stream} />
+                    </div>
+                  )}
+                  
+                  <div className="p-8 border-2 border-dashed border-border rounded-lg bg-muted/20 min-h-[400px] flex items-center justify-center">
+                    <p className="text-muted-foreground font-body text-center">
+                      Your work area<br />
+                      <span className="text-sm">Focus on your tasks while we track your attention</span>
+                    </p>
+                  </div>
+                </div>
 
-        {/* Controls */}
-        <div className="flex gap-4">
-          {!isTracking ? (
-            <Button
-              onClick={handleStart}
-              size="lg"
-              className="font-body font-medium px-8 py-6 text-lg rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-500 ease-zen"
-            >
-              <Play className="w-5 h-5 mr-2" />
-              Begin Session
-            </Button>
-          ) : (
-            <Button
-              onClick={handleStop}
-              size="lg"
-              variant="outline"
-              className="font-body font-medium px-8 py-6 text-lg rounded-full border-2 hover:bg-destructive hover:text-destructive-foreground hover:border-destructive transition-all duration-500 ease-zen"
-            >
-              <Square className="w-5 h-5 mr-2" />
-              End Session
-            </Button>
-          )}
-        </div>
-
-            {/* Stats */}
-            {isTracking && (
-              <div className="w-full max-w-3xl animate-in fade-in slide-in-from-bottom duration-700">
-                <FocusStats
-                  sessionDuration={sessionDuration}
-                  focusLevel={focusLevel}
-                  nudgeCount={nudgeCount}
-                />
+                {/* Right: Active Session Sidebar */}
+                <aside className="w-full max-w-sm">
+                  <ActiveSessionSidebar
+                    sessionDuration={sessionDuration}
+                    focusLevel={focusLevel}
+                    nudgeCount={nudgeCount}
+                    focusHistory={focusLevels}
+                    onEndSession={handleStop}
+                    onTakeBreak={handleTakeBreak}
+                  />
+                </aside>
+              </div>
+            ) : (
+              /* Before Session Starts */
+              <div className="flex flex-col items-center gap-16">
+                <div className="flex gap-4">
+                  <Button
+                    onClick={handleStart}
+                    size="lg"
+                    className="font-body font-medium px-8 py-6 text-lg"
+                  >
+                    <Play className="w-5 h-5 mr-2" />
+                    Begin Session
+                  </Button>
+                </div>
               </div>
             )}
           </TabsContent>

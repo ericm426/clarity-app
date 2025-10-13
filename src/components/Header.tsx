@@ -20,9 +20,9 @@ const Header = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleFocusMetricsClick = () => {
+  const handleDashboardClick = () => {
     if (user) {
-      navigate('/track');
+      navigate('/dashboard');
     } else {
       navigate('/auth');
     }
@@ -44,10 +44,10 @@ const Header = () => {
             Clarity
           </h1>
           <button
-            onClick={handleFocusMetricsClick}
+            onClick={handleDashboardClick}
             className="text-sm font-body font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
-            Focus Metrics
+            Dashboard
           </button>
         </div>
 
