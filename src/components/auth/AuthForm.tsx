@@ -138,7 +138,7 @@ export const AuthForm = () => {
             className="w-full"
             onClick={() => setIsLogin(!isLogin)}
           >
-            {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+            {isLogin ? "Sign up" : 'Sign in'}
           </Button>
         </form>
       </CardContent>
