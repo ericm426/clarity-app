@@ -25,6 +25,29 @@ export const useFaceTracking = () => {
   const focusHistoryRef = useRef<number[]>([]);
   const lastDetectionTimeRef = useRef<number>(Date.now());
 
+  // Calculate Euclidean distance between two 3D points
+  const calculateDistance = (p1: any, p2: any): number => {
+    return Math.sqrt(
+      Math.pow(p1.x - p2.x, 2) +
+      Math.pow(p1.y - p2.y, 2) +
+      Math.pow(p1.z - p2.z, 2)
+    );
+  };
+
+  // Calculate Eye Aspect Ratio (EAR)
+  // EAR = (||p2-p6|| + ||p3-p5||) / (2 * ||p1-p4||)
+  const calculateEAR = (eye: any[]): number => {
+    // Vertical distances
+    const vertical1 = calculateDistance(eye[1], eye[5]);
+    const vertical2 = calculateDistance(eye[2], eye[4]);
+    
+    // Horizontal distance
+    const horizontal = calculateDistance(eye[0], eye[3]);
+    
+    // EAR formula
+    return (vertical1 + vertical2) / (2.0 * horizontal);
+  };
+
   const startTracking = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -65,27 +88,49 @@ export const useFaceTracking = () => {
         if (faceDetected) {
           const landmarks = results.multiFaceLandmarks[0];
           
-          // Get eye landmarks (left eye: 33, right eye: 263)
-          const leftEye = landmarks[33];
-          const rightEye = landmarks[263];
+          // MediaPipe Face Mesh eye landmark indices
+          // Left eye: 33 (left corner), 133 (right corner), 160, 159 (top), 144, 145 (bottom)
+          const leftEyePoints = [
+            landmarks[33],  // left corner
+            landmarks[160], // top 1
+            landmarks[159], // top 2
+            landmarks[133], // right corner
+            landmarks[145], // bottom 1
+            landmarks[144]  // bottom 2
+          ];
           
-          // Calculate eye openness (vertical distance between upper and lower eyelid)
-          const leftEyeOpenness = Math.abs(landmarks[159].y - landmarks[145].y);
-          const rightEyeOpenness = Math.abs(landmarks[386].y - landmarks[374].y);
-          const avgEyeOpenness = (leftEyeOpenness + rightEyeOpenness) / 2;
+          // Right eye: 362 (right corner), 263 (left corner), 385, 387 (top), 373, 380 (bottom)
+          const rightEyePoints = [
+            landmarks[362], // right corner
+            landmarks[385], // top 1
+            landmarks[387], // top 2
+            landmarks[263], // left corner
+            landmarks[380], // bottom 1
+            landmarks[373]  // bottom 2
+          ];
+          
+          // Calculate EAR for both eyes
+          const leftEAR = calculateEAR(leftEyePoints);
+          const rightEAR = calculateEAR(rightEyePoints);
+          const avgEAR = (leftEAR + rightEAR) / 2;
           
           // Calculate head pose (check if facing camera)
           const noseTip = landmarks[1];
           const faceCenter = landmarks[168];
           const headTilt = Math.abs(noseTip.x - faceCenter.x);
           
-          // Eyes open and facing camera = high focus
-          if (avgEyeOpenness > 0.015 && headTilt < 0.1) {
-            currentFocus = 95;
-          } else if (avgEyeOpenness > 0.01) {
-            currentFocus = 70; // Eyes open but not fully engaged
+          // Classify focus based on EAR thresholds
+          // EAR > 0.25 = fully open eyes (alert)
+          // EAR 0.2-0.25 = partially open (drowsy)
+          // EAR < 0.2 = closed/blinking
+          if (avgEAR > 0.25 && headTilt < 0.1) {
+            currentFocus = 95; // Fully engaged
+          } else if (avgEAR > 0.20 && headTilt < 0.15) {
+            currentFocus = 75; // Moderately focused
+          } else if (avgEAR > 0.15) {
+            currentFocus = 50; // Drowsy or looking away
           } else {
-            currentFocus = 40; // Eyes closed or looking away
+            currentFocus = 30; // Eyes closed or distracted
           }
         }
         
