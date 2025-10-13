@@ -45,18 +45,21 @@ export const useFaceTracking = () => {
     const leftMouth = landmarks[61];     // Left mouth corner
     const rightMouth = landmarks[291];   // Right mouth corner
     
-    // Calculate yaw (left-right rotation)
+    // Calculate face size for normalization (distance between eyes)
+    const eyeDistance = calculateDistance(leftEye, rightEye);
+    
+    // Calculate yaw (left-right rotation) - normalized by face size
     const eyeCenter = {
       x: (leftEye.x + rightEye.x) / 2,
       y: (leftEye.y + rightEye.y) / 2,
       z: (leftEye.z + rightEye.z) / 2
     };
-    const noseToEyeCenter = noseTip.x - eyeCenter.x;
-    const yaw = Math.atan2(noseToEyeCenter, 0.1) * (180 / Math.PI);
+    const noseToEyeCenter = (noseTip.x - eyeCenter.x) / eyeDistance;
+    const yaw = Math.atan2(noseToEyeCenter, 0.4) * (180 / Math.PI);
     
-    // Calculate pitch (up-down rotation)
-    const noseToEyeY = noseTip.y - eyeCenter.y;
-    const pitch = Math.atan2(noseToEyeY, 0.3) * (180 / Math.PI);
+    // Calculate pitch (up-down rotation) - normalized by face size
+    const noseToEyeY = (noseTip.y - eyeCenter.y) / eyeDistance;
+    const pitch = Math.atan2(noseToEyeY, 1.2) * (180 / Math.PI);
     
     // Calculate roll (head tilt to side)
     const eyeSlope = (rightEye.y - leftEye.y) / (rightEye.x - leftEye.x);
