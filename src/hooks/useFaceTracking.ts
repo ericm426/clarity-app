@@ -88,16 +88,16 @@ export const useFaceTracking = () => {
           const totalHeadTilt = Math.sqrt(horizontalTilt * horizontalTilt + verticalTilt * verticalTilt);
           
           // Eyes open and facing camera = high focus
-          if (avgEyeOpenness > 0.08 && totalHeadTilt < 0.25) {
+          if (avgEyeOpenness > 0.08 && totalHeadTilt < 0.4) {
             currentFocus = 95;
-          } else if (avgEyeOpenness > 0.08 && totalHeadTilt < 0.4) {
-            currentFocus = 75; // Eyes open but slight head turn
-          } else if (avgEyeOpenness > 0.05 && totalHeadTilt < 0.4) {
-            currentFocus = 55; // Eyes open but moderate head turn
-          } else if (totalHeadTilt >= 0.4) {
-            currentFocus = 30; // Head significantly turned away
+          } else if (avgEyeOpenness > 0.08 && totalHeadTilt < 0.6) {
+            currentFocus = 70; // Eyes open but slight head turn
+          } else if (avgEyeOpenness > 0.05 && totalHeadTilt < 0.6) {
+            currentFocus = 50; // Eyes open but moderate head turn
+          } else if (totalHeadTilt >= 0.6) {
+            currentFocus = 25; // Head significantly turned away
           } else {
-            currentFocus = 35; // Eyes closed or looking away
+            currentFocus = 30; // Eyes closed or looking away
           }
         }
         
