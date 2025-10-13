@@ -107,19 +107,21 @@ export const useFaceTracking = () => {
           // Calculate head pose angles
           const headPose = calculateHeadPose(landmarks);
           
-          // Calculate overall head alignment score (0-1) with more lenient thresholds
-          // Perfect alignment: pitch ≈ 0, yaw ≈ 0, roll ≈ 0
-          const pitchScore = Math.max(0, 1 - Math.abs(headPose.pitch) / 45);  // Allow ±45° before full penalty
-          const yawScore = Math.max(0, 1 - Math.abs(headPose.yaw) / 50);      // Allow ±50° before full penalty
-          const rollScore = Math.max(0, 1 - Math.abs(headPose.roll) / 35);    // Allow ±35° before full penalty
+          // Calculate overall head alignment score (0-1) with very lenient thresholds
+          // These are calibrated for normal screen viewing posture
+          const pitchScore = Math.max(0, 1 - Math.abs(headPose.pitch) / 60);  // Allow ±60° 
+          const yawScore = Math.max(0, 1 - Math.abs(headPose.yaw) / 70);      // Allow ±70° 
+          const rollScore = Math.max(0, 1 - Math.abs(headPose.roll) / 50);    // Allow ±50° 
           const headAlignmentScore = (pitchScore + yawScore + rollScore) / 3;
           
-          // Convert alignment score to focus percentage (more continuous)
-          // Scale from 0.5-1.0 alignment to 30-95% focus
-          if (headAlignmentScore > 0.5) {
-            currentFocus = Math.round(30 + (headAlignmentScore - 0.5) * 130);
+          // Convert alignment score to focus percentage
+          // More generous scaling: alignment 0.6+ should give 80%+ focus
+          if (headAlignmentScore > 0.4) {
+            // Map 0.4-1.0 to 50-95%
+            currentFocus = Math.round(50 + (headAlignmentScore - 0.4) * 75);
           } else {
-            currentFocus = Math.round(headAlignmentScore * 60);
+            // Map 0-0.4 to 25-50%
+            currentFocus = Math.round(25 + headAlignmentScore * 62.5);
           }
           
           // Clamp to valid range
