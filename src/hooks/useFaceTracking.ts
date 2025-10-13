@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
+import { FaceMesh } from '@mediapipe/face_mesh';
+import { Camera } from '@mediapipe/camera_utils';
 
 interface FaceTrackingState {
   isTracking: boolean;
@@ -17,10 +19,11 @@ export const useFaceTracking = () => {
   });
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const detectionIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const faceMeshRef = useRef<FaceMesh | null>(null);
+  const cameraRef = useRef<Camera | null>(null);
   const focusHistoryRef = useRef<number[]>([]);
+  const lastDetectionTimeRef = useRef<number>(Date.now());
 
   const startTracking = async () => {
     try {
@@ -34,19 +37,96 @@ export const useFaceTracking = () => {
         videoRef.current.playsInline = true;
       }
 
-      if (!canvasRef.current) {
-        canvasRef.current = document.createElement('canvas');
-      }
-
       videoRef.current.srcObject = stream;
       streamRef.current = stream;
 
       await videoRef.current.play();
 
-      setState((prev) => ({ ...prev, isTracking: true, stream }));
+      // Initialize MediaPipe Face Mesh
+      const faceMesh = new FaceMesh({
+        locateFile: (file) => {
+          return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+        },
+      });
 
-      // Start face detection
-      startDetection();
+      faceMesh.setOptions({
+        maxNumFaces: 1,
+        refineLandmarks: true,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5,
+      });
+
+      faceMesh.onResults((results) => {
+        const faceDetected = results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0;
+        
+        // Calculate focus level based on face detection and facial metrics
+        let currentFocus = 30; // Default low focus when no face
+        
+        if (faceDetected) {
+          const landmarks = results.multiFaceLandmarks[0];
+          
+          // Get eye landmarks (left eye: 33, right eye: 263)
+          const leftEye = landmarks[33];
+          const rightEye = landmarks[263];
+          
+          // Calculate eye openness (vertical distance between upper and lower eyelid)
+          const leftEyeOpenness = Math.abs(landmarks[159].y - landmarks[145].y);
+          const rightEyeOpenness = Math.abs(landmarks[386].y - landmarks[374].y);
+          const avgEyeOpenness = (leftEyeOpenness + rightEyeOpenness) / 2;
+          
+          // Calculate head pose (check if facing camera)
+          const noseTip = landmarks[1];
+          const faceCenter = landmarks[168];
+          const headTilt = Math.abs(noseTip.x - faceCenter.x);
+          
+          // Eyes open and facing camera = high focus
+          if (avgEyeOpenness > 0.015 && headTilt < 0.1) {
+            currentFocus = 95;
+          } else if (avgEyeOpenness > 0.01) {
+            currentFocus = 70; // Eyes open but not fully engaged
+          } else {
+            currentFocus = 40; // Eyes closed or looking away
+          }
+        }
+        
+        focusHistoryRef.current.push(currentFocus);
+
+        // Keep last 30 seconds of history (assuming ~30fps = ~900 samples for 30s)
+        if (focusHistoryRef.current.length > 900) {
+          focusHistoryRef.current.shift();
+        }
+
+        // Calculate average focus level
+        const avgFocus = Math.round(
+          focusHistoryRef.current.reduce((a, b) => a + b, 0) / focusHistoryRef.current.length
+        );
+
+        lastDetectionTimeRef.current = Date.now();
+
+        setState((prev) => ({
+          ...prev,
+          focusLevel: avgFocus,
+          isFaceDetected: faceDetected,
+        }));
+      });
+
+      faceMeshRef.current = faceMesh;
+
+      // Initialize camera
+      const camera = new Camera(videoRef.current, {
+        onFrame: async () => {
+          if (faceMeshRef.current && videoRef.current) {
+            await faceMeshRef.current.send({ image: videoRef.current });
+          }
+        },
+        width: 640,
+        height: 480,
+      });
+
+      await camera.start();
+      cameraRef.current = camera;
+
+      setState((prev) => ({ ...prev, isTracking: true, stream }));
 
       toast.success('Focus tracking started', {
         description: 'Maintaining your attention...',
@@ -59,85 +139,24 @@ export const useFaceTracking = () => {
     }
   };
 
-  const startDetection = () => {
-    if (detectionIntervalRef.current) return;
-
-    detectionIntervalRef.current = setInterval(() => {
-      detectFace();
-    }, 1000); // Check every second
-  };
-
-  const detectFace = () => {
-    if (!videoRef.current || !canvasRef.current) return;
-
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-
-    if (!ctx) return;
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    ctx.drawImage(video, 0, 0);
-
-    // Simple brightness-based face detection
-    // In a production app, you'd use a proper ML model
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imageData.data;
-
-    let totalBrightness = 0;
-    let pixelCount = 0;
-
-    // Sample center region where face should be
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-    const sampleSize = 100;
-
-    for (let y = centerY - sampleSize; y < centerY + sampleSize; y++) {
-      for (let x = centerX - sampleSize; x < centerX + sampleSize; x++) {
-        const i = (y * canvas.width + x) * 4;
-        const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
-        totalBrightness += brightness;
-        pixelCount++;
-      }
-    }
-
-    const avgBrightness = totalBrightness / pixelCount;
-    
-    // Face detected if brightness is in human skin range (60-180)
-    const faceDetected = avgBrightness > 60 && avgBrightness < 180;
-
-    // Update focus level based on face detection
-    const currentFocus = faceDetected ? 95 : 30;
-    focusHistoryRef.current.push(currentFocus);
-
-    // Keep last 30 seconds of history
-    if (focusHistoryRef.current.length > 30) {
-      focusHistoryRef.current.shift();
-    }
-
-    // Calculate average focus level
-    const avgFocus = Math.round(
-      focusHistoryRef.current.reduce((a, b) => a + b, 0) / focusHistoryRef.current.length
-    );
-
-    setState((prev) => ({
-      ...prev,
-      focusLevel: avgFocus,
-      isFaceDetected: faceDetected,
-    }));
-  };
 
   const stopTracking = () => {
+    // Stop camera
+    if (cameraRef.current) {
+      cameraRef.current.stop();
+      cameraRef.current = null;
+    }
+
+    // Close face mesh
+    if (faceMeshRef.current) {
+      faceMeshRef.current.close();
+      faceMeshRef.current = null;
+    }
+
+    // Stop media stream
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
-    }
-
-    if (detectionIntervalRef.current) {
-      clearInterval(detectionIntervalRef.current);
-      detectionIntervalRef.current = null;
     }
 
     if (videoRef.current) {
