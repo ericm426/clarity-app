@@ -5,6 +5,7 @@ interface FaceTrackingState {
   isTracking: boolean;
   focusLevel: number;
   isFaceDetected: boolean;
+  stream: MediaStream | null;
 }
 
 export const useFaceTracking = () => {
@@ -12,6 +13,7 @@ export const useFaceTracking = () => {
     isTracking: false,
     focusLevel: 100,
     isFaceDetected: false,
+    stream: null,
   });
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -41,7 +43,7 @@ export const useFaceTracking = () => {
 
       await videoRef.current.play();
 
-      setState((prev) => ({ ...prev, isTracking: true }));
+      setState((prev) => ({ ...prev, isTracking: true, stream }));
 
       // Start face detection
       startDetection();
@@ -148,6 +150,7 @@ export const useFaceTracking = () => {
       isTracking: false,
       focusLevel: 100,
       isFaceDetected: false,
+      stream: null,
     });
 
     toast.info('Focus tracking stopped');

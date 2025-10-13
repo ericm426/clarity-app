@@ -3,15 +3,32 @@ import { Button } from '@/components/ui/button';
 import { BreathingCircle } from '@/components/BreathingCircle';
 import { FocusStats } from '@/components/FocusStats';
 import { NudgeAlert } from '@/components/NudgeAlert';
+import { CameraPreview } from '@/components/CameraPreview';
 import { useFaceTracking } from '@/hooks/useFaceTracking';
-import { Play, Square } from 'lucide-react';
+import { Play, Square, LogOut } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
-const Index = () => {
-  const { isTracking, focusLevel, isFaceDetected, startTracking, stopTracking } = useFaceTracking();
+const Track = () => {
+  const { isTracking, focusLevel, isFaceDetected, stream, startTracking, stopTracking } = useFaceTracking();
   const [sessionDuration, setSessionDuration] = useState(0);
   const [nudgeCount, setNudgeCount] = useState(0);
   const [showNudge, setShowNudge] = useState(false);
   const [lowFocusDuration, setLowFocusDuration] = useState(0);
+  const navigate = useNavigate();
+
+  // Check authentication
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('Please sign in to access focus tracking');
+        navigate('/auth');
+      }
+    };
+    checkAuth();
+  }, [navigate]);
 
   // Session timer
   useEffect(() => {
@@ -52,24 +69,49 @@ const Index = () => {
     stopTracking();
   };
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast.success('Signed out successfully');
+    navigate('/');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/80 flex flex-col">
       <NudgeAlert isVisible={showNudge} onDismiss={() => setShowNudge(false)} />
 
       {/* Header */}
       <header className="container mx-auto px-6 py-8">
-        <div className="text-center">
-          <h1 className="text-5xl md:text-6xl font-headline font-bold text-foreground mb-2">
-            Nudge
-          </h1>
-          <p className="text-lg font-body text-muted-foreground tracking-wide">
-            The Mindful Focus System
-          </p>
+        <div className="flex justify-between items-center">
+          <div className="text-center flex-1">
+            <h1 className="text-5xl md:text-6xl font-headline font-bold text-foreground mb-2">
+              Nudge
+            </h1>
+            <p className="text-lg font-body text-muted-foreground tracking-wide">
+              The Mindful Focus System
+            </p>
+          </div>
+          <Button
+            onClick={handleLogout}
+            variant="ghost"
+            size="sm"
+            className="font-body"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Sign Out
+          </Button>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="container mx-auto px-6 flex-1 flex flex-col items-center justify-center gap-16">
+        {/* Camera Preview */}
+        {isTracking && stream && (
+          <div className="flex flex-col items-center gap-2">
+            <p className="text-sm font-body text-muted-foreground mb-2">Camera Preview</p>
+            <CameraPreview stream={stream} />
+          </div>
+        )}
+
         {/* Breathing Circle */}
         <div className="flex flex-col items-center gap-8">
           <BreathingCircle isFocused={isFaceDetected} focusLevel={focusLevel} />
@@ -129,4 +171,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Track;
