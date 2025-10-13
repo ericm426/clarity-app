@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      focus_sessions: {
+        Row: {
+          average_focus_level: number | null
+          created_at: string
+          ended_at: string
+          id: string
+          nudge_count: number
+          session_duration: number
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          average_focus_level?: number | null
+          created_at?: string
+          ended_at: string
+          id?: string
+          nudge_count?: number
+          session_duration: number
+          started_at: string
+          user_id: string
+        }
+        Update: {
+          average_focus_level?: number | null
+          created_at?: string
+          ended_at?: string
+          id?: string
+          nudge_count?: number
+          session_duration?: number
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
