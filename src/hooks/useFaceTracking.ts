@@ -24,49 +24,6 @@ export const useFaceTracking = () => {
   const cameraRef = useRef<Camera | null>(null);
   const focusHistoryRef = useRef<number[]>([]);
   const lastDetectionTimeRef = useRef<number>(Date.now());
-  const lookingDownDurationRef = useRef<number>(0); // Track how long user is looking down
-
-  // Calculate Euclidean distance between two 3D points
-  const calculateDistance = (p1: any, p2: any): number => {
-    return Math.sqrt(
-      Math.pow(p1.x - p2.x, 2) +
-      Math.pow(p1.y - p2.y, 2) +
-      Math.pow(p1.z - p2.z, 2)
-    );
-  };
-
-  // Calculate head pose angles (pitch, yaw, roll) in degrees
-  const calculateHeadPose = (landmarks: any): { pitch: number; yaw: number; roll: number } => {
-    // Key facial landmarks for head pose
-    const noseTip = landmarks[1];        // Nose tip
-    const chin = landmarks[152];         // Chin
-    const leftEye = landmarks[33];       // Left eye outer corner
-    const rightEye = landmarks[263];     // Right eye outer corner
-    const leftMouth = landmarks[61];     // Left mouth corner
-    const rightMouth = landmarks[291];   // Right mouth corner
-    
-    // Calculate face size for normalization (distance between eyes)
-    const eyeDistance = calculateDistance(leftEye, rightEye);
-    
-    // Calculate yaw (left-right rotation) - normalized by face size
-    const eyeCenter = {
-      x: (leftEye.x + rightEye.x) / 2,
-      y: (leftEye.y + rightEye.y) / 2,
-      z: (leftEye.z + rightEye.z) / 2
-    };
-    const noseToEyeCenter = (noseTip.x - eyeCenter.x) / eyeDistance;
-    const yaw = Math.atan2(noseToEyeCenter, 0.4) * (180 / Math.PI);
-    
-    // Calculate pitch (up-down rotation) - normalized by face size
-    const noseToEyeY = (noseTip.y - eyeCenter.y) / eyeDistance;
-    const pitch = Math.atan2(noseToEyeY, 1.2) * (180 / Math.PI);
-    
-    // Calculate roll (head tilt to side)
-    const eyeSlope = (rightEye.y - leftEye.y) / (rightEye.x - leftEye.x);
-    const roll = Math.atan(eyeSlope) * (180 / Math.PI);
-    
-    return { pitch, yaw, roll };
-  };
 
   const startTracking = async () => {
     try {
@@ -108,62 +65,28 @@ export const useFaceTracking = () => {
         if (faceDetected) {
           const landmarks = results.multiFaceLandmarks[0];
           
-          // Calculate head pose angles
-          const headPose = calculateHeadPose(landmarks);
+          // Get eye landmarks (left eye: 33, right eye: 263)
+          const leftEye = landmarks[33];
+          const rightEye = landmarks[263];
           
-          // Track sustained downward gaze (distraction indicator)
-          if (headPose.pitch > 15) { // Looking down more than 15 degrees
-            lookingDownDurationRef.current += 1; // Increment by frame (~30fps)
+          // Calculate eye openness (vertical distance between upper and lower eyelid)
+          const leftEyeOpenness = Math.abs(landmarks[159].y - landmarks[145].y);
+          const rightEyeOpenness = Math.abs(landmarks[386].y - landmarks[374].y);
+          const avgEyeOpenness = (leftEyeOpenness + rightEyeOpenness) / 2;
+          
+          // Calculate head pose (check if facing camera)
+          const noseTip = landmarks[1];
+          const faceCenter = landmarks[168];
+          const headTilt = Math.abs(noseTip.x - faceCenter.x);
+          
+          // Eyes open and facing camera = high focus
+          if (avgEyeOpenness > 0.015 && headTilt < 0.1) {
+            currentFocus = 95;
+          } else if (avgEyeOpenness > 0.01) {
+            currentFocus = 70; // Eyes open but not fully engaged
           } else {
-            lookingDownDurationRef.current = 0; // Reset if looking up
+            currentFocus = 40; // Eyes closed or looking away
           }
-          
-          // Calculate focus score based on head direction
-          // Forward (good posture): 80-100%
-          // Sideways (yaw): 45-70%
-          // Down (pitch): Heavy penalty, 25-50%
-          
-          const absPitch = Math.abs(headPose.pitch);
-          const absYaw = Math.abs(headPose.yaw);
-          const absRoll = Math.abs(headPose.roll);
-          
-          // Start with perfect score
-          let score = 100;
-          
-          // Apply pitch penalty (up/down movement)
-          // Looking down is particularly problematic (distraction indicator)
-          if (headPose.pitch > 15) {
-            // Looking down: heavy penalty
-            const downAmount = Math.min(headPose.pitch, 45) / 45; // 0-1 scale
-            score -= downAmount * 50; // Up to -50 points for looking down
-            
-            // Extra penalty for sustained downward gaze (10-15+ seconds)
-            if (lookingDownDurationRef.current > 300) {
-              score -= 15; // Additional -15 points
-            }
-          } else if (absPitch > 15) {
-            // Looking up: moderate penalty
-            const upAmount = Math.min(absPitch, 35) / 35;
-            score -= upAmount * 25; // Up to -25 points
-          }
-          
-          // Apply yaw penalty (left/right movement)
-          if (absYaw > 10) {
-            // Sideways: should result in 45-70% range
-            const sidewaysAmount = Math.min(absYaw, 50) / 50; // 0-1 scale
-            score -= sidewaysAmount * 40; // Up to -40 points for looking sideways
-          }
-          
-          // Apply roll penalty (head tilt)
-          if (absRoll > 15) {
-            const tiltAmount = Math.min(absRoll, 40) / 40;
-            score -= tiltAmount * 20; // Up to -20 points
-          }
-          
-          // Clamp to valid range
-          currentFocus = Math.round(Math.max(25, Math.min(100, score)));
-        } else {
-          lookingDownDurationRef.current = 0; // Reset when face not detected
         }
         
         focusHistoryRef.current.push(currentFocus);
@@ -241,7 +164,6 @@ export const useFaceTracking = () => {
     }
 
     focusHistoryRef.current = [];
-    lookingDownDurationRef.current = 0;
 
     setState({
       isTracking: false,
