@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { Bell } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { useEffect, useState } from "react";
+import { Bell } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 interface NudgeAlertProps {
   isVisible: boolean;
@@ -35,14 +35,8 @@ export const NudgeAlert = ({ isVisible, onDismiss }: NudgeAlertProps) => {
     >
       <Card className="p-6 bg-destructive/95 backdrop-blur-sm border-destructive text-destructive-foreground shadow-2xl cursor-pointer hover:scale-105 transition-transform duration-300 ease-zen">
         <div className="flex items-center gap-4">
-          <div className="p-3 rounded-full bg-destructive-foreground/20 animate-pulse-glow">
-            <Bell className="w-6 h-6" />
-          </div>
           <div>
-            <h3 className="font-headline text-lg font-semibold mb-1">Gentle Nudge</h3>
-            <p className="font-body text-sm opacity-90">
-              Your focus has wandered. Take a deep breath and return to the present moment.
-            </p>
+            <p className="font-body text-sm opacity-90">Your focus has wandered.</p>
           </div>
         </div>
       </Card>
