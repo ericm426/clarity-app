@@ -43,7 +43,7 @@ const Landing = () => {
             Professional Focus Analytics Platform
           </p>
           <p className="text-lg font-body text-muted-foreground mb-12 max-w-2xl mx-auto">
-            Transform your attention into valuable business intelligence. Clean dashboards, data visualization excellence, 
+            Transform your attention into valuable intelligence. Clean dashboards, data visualization excellence, 
             and professional insights for serious students and professionals.
           </p>
           <Button
@@ -51,18 +51,15 @@ const Landing = () => {
             size="lg"
             className="font-body font-medium px-12 py-6 text-lg rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all"
           >
-            Get Started Free
+            Get Started For Free
           </Button>
         </div>
       </section>
 
       {/* Features Section */}
       <section className="container mx-auto px-6 py-20">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           <div className="text-center p-6">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-              <Eye className="w-8 h-8 text-primary" />
-            </div>
             <h3 className="text-xl font-headline font-semibold mb-2">Smart Eye Tracking</h3>
             <p className="text-muted-foreground font-body">
               Advanced camera-based tracking monitors your focus in real-time
@@ -70,9 +67,6 @@ const Landing = () => {
           </div>
 
           <div className="text-center p-6">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-              <Brain className="w-8 h-8 text-primary" />
-            </div>
             <h3 className="text-xl font-headline font-semibold mb-2">Gentle Nudges</h3>
             <p className="text-muted-foreground font-body">
               Receive mindful reminders when your attention starts to wander
@@ -80,22 +74,9 @@ const Landing = () => {
           </div>
 
           <div className="text-center p-6">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-              <Target className="w-8 h-8 text-primary" />
-            </div>
             <h3 className="text-xl font-headline font-semibold mb-2">Focus Metrics</h3>
             <p className="text-muted-foreground font-body">
               Track your concentration levels and session performance
-            </p>
-          </div>
-
-          <div className="text-center p-6">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-              <Zap className="w-8 h-8 text-primary" />
-            </div>
-            <h3 className="text-xl font-headline font-semibold mb-2">Breathing Sync</h3>
-            <p className="text-muted-foreground font-body">
-              Visual breathing guide helps you stay centered and calm
             </p>
           </div>
         </div>
@@ -125,7 +106,7 @@ const Landing = () => {
               <div>
                 <h3 className="text-xl font-headline font-semibold mb-2">Start Your Focus Session</h3>
                 <p className="text-muted-foreground font-body">
-                  Begin tracking with visual breathing guidance to help you center your attention
+                  Begin tracking to help you center your attention
                 </p>
               </div>
             </div>
@@ -135,9 +116,9 @@ const Landing = () => {
                 3
               </div>
               <div>
-                <h3 className="text-xl font-headline font-semibold mb-2">Get Gentle Nudges</h3>
+                <h3 className="text-xl font-headline font-semibold mb-2">Get Alerts</h3>
                 <p className="text-muted-foreground font-body">
-                  Receive mindful alerts when your attention drifts away from the screen
+                  Receive alerts when your attention drifts away from the screen
                 </p>
               </div>
             </div>
@@ -162,7 +143,6 @@ const Landing = () => {
         <div className="max-w-3xl mx-auto text-center bg-primary/5 rounded-3xl p-12">
           <h2 className="text-4xl font-headline font-bold mb-6">Ready to Transform Your Focus?</h2>
           <p className="text-lg font-body text-muted-foreground mb-8">
-            Join thousands of users who have improved their concentration and productivity
           </p>
           <Button
             onClick={handleGetStarted}
@@ -177,7 +157,7 @@ const Landing = () => {
       {/* Footer */}
       <footer className="container mx-auto px-6 py-8 text-center border-t">
         <p className="text-sm font-body text-muted-foreground">
-          Professional attention analytics. Data-driven insights.
+          Attention analytics. Data-driven insights.
         </p>
       </footer>
     </div>
