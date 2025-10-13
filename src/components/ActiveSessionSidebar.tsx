@@ -103,7 +103,7 @@ export const ActiveSessionSidebar = ({
         <Button
           onClick={onEndSession}
           variant="outline"
-          className="w-full font-body font-medium"
+          className="w-full font-body font-medium justify-start"
         >
           <Square className="w-4 h-4 mr-2" />
           End session
@@ -111,7 +111,7 @@ export const ActiveSessionSidebar = ({
         <Button
           onClick={onTakeBreak}
           variant="outline"
-          className="w-full font-body font-medium"
+          className="w-full font-body font-medium justify-start"
         >
           <Coffee className="w-4 h-4 mr-2" />
           Take break

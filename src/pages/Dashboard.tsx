@@ -8,9 +8,7 @@ import Header from '@/components/Header';
 import { 
   ArrowUp, 
   ArrowDown, 
-  Play, 
-  FileText, 
-  Download,
+  Play,
   TrendingUp,
   Clock,
   Zap
@@ -157,27 +155,6 @@ const Dashboard = () => {
     });
 
     return hourlyData;
-  };
-
-  const exportData = () => {
-    const csvContent = [
-      ['Date', 'Duration (min)', 'Focus Level', 'Nudges'],
-      ...sessions.map(s => [
-        format(parseISO(s.started_at), 'yyyy-MM-dd HH:mm'),
-        (s.session_duration / 60).toFixed(1),
-        (s.average_focus_level || 0).toFixed(1),
-        s.nudge_count
-      ])
-    ].map(row => row.join(',')).join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `focus-data-${format(new Date(), 'yyyy-MM-dd')}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success('Data exported successfully');
   };
 
   if (loading) {
@@ -417,24 +394,6 @@ const Dashboard = () => {
           >
             <Play className="w-4 h-4 mr-2" />
             Start Session
-          </Button>
-          <Button
-            onClick={() => navigate('/track')}
-            variant="outline"
-            size="lg"
-            className="font-body font-medium px-6"
-          >
-            <FileText className="w-4 h-4 mr-2" />
-            View Detailed Report
-          </Button>
-          <Button
-            onClick={exportData}
-            variant="outline"
-            size="lg"
-            className="font-body font-medium px-6"
-          >
-            <Download className="w-4 h-4 mr-2" />
-            Export Data
           </Button>
         </div>
       </main>

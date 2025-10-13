@@ -117,53 +117,53 @@ const Track = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-8 flex-1">
-        <Tabs defaultValue="track" className="w-full">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
-            <TabsTrigger value="track" className="flex items-center gap-2">
-              <Video className="w-4 h-4" />
-              Track Session
-            </TabsTrigger>
-            <TabsTrigger value="metrics" className="flex items-center gap-2">
-              <BarChart3 className="w-4 h-4" />
-              View Metrics
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="track" className="mt-8">
-            {/* Active Session Split Screen */}
-            {isTracking ? (
-              <div className="flex gap-8 max-w-7xl mx-auto">
-                {/* Left: Main Work Area */}
-                <div className="flex-1 space-y-6">
-                  {stream && (
-                    <div className="flex flex-col items-center gap-2">
-                      <p className="text-sm font-body text-muted-foreground mb-2">Camera Preview</p>
-                      <CameraPreview stream={stream} />
-                    </div>
-                  )}
-                  
-                  <div className="p-8 border-2 border-dashed border-border rounded-lg bg-muted/20 min-h-[400px] flex items-center justify-center">
-                    <p className="text-muted-foreground font-body text-center">
-                      Your work area<br />
-                      <span className="text-sm">Focus on your tasks while we track your attention</span>
-                    </p>
-                  </div>
+        {isTracking ? (
+          /* Active Session Split Screen - No Tabs */
+          <div className="flex gap-8 max-w-7xl mx-auto">
+            {/* Left: Main Work Area */}
+            <div className="flex-1 space-y-6">
+              {stream && (
+                <div className="flex flex-col items-center gap-2">
+                  <p className="text-sm font-body text-muted-foreground mb-2">Camera Preview</p>
+                  <CameraPreview stream={stream} />
                 </div>
-
-                {/* Right: Active Session Sidebar */}
-                <aside className="w-full max-w-sm">
-                  <ActiveSessionSidebar
-                    sessionDuration={sessionDuration}
-                    focusLevel={focusLevel}
-                    nudgeCount={nudgeCount}
-                    focusHistory={focusLevels}
-                    onEndSession={handleStop}
-                    onTakeBreak={handleTakeBreak}
-                  />
-                </aside>
+              )}
+              
+              <div className="p-8 border-2 border-dashed border-border rounded-lg bg-muted/20 min-h-[400px] flex items-center justify-center">
+                <p className="text-muted-foreground font-body text-center">
+                  Your work area<br />
+                  <span className="text-sm">Focus on your tasks while we track your attention</span>
+                </p>
               </div>
-            ) : (
-              /* Before Session Starts */
+            </div>
+
+            {/* Right: Active Session Sidebar */}
+            <aside className="w-full max-w-sm">
+              <ActiveSessionSidebar
+                sessionDuration={sessionDuration}
+                focusLevel={focusLevel}
+                nudgeCount={nudgeCount}
+                focusHistory={focusLevels}
+                onEndSession={handleStop}
+                onTakeBreak={handleTakeBreak}
+              />
+            </aside>
+          </div>
+        ) : (
+          /* Before Session Starts - With Tabs */
+          <Tabs defaultValue="track" className="w-full">
+            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
+              <TabsTrigger value="track" className="flex items-center gap-2">
+                <Video className="w-4 h-4" />
+                Track Session
+              </TabsTrigger>
+              <TabsTrigger value="metrics" className="flex items-center gap-2">
+                <BarChart3 className="w-4 h-4" />
+                View Metrics
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="track" className="mt-8">
               <div className="flex flex-col items-center gap-16">
                 <div className="flex gap-4">
                   <Button
@@ -176,8 +176,7 @@ const Track = () => {
                   </Button>
                 </div>
               </div>
-            )}
-          </TabsContent>
+            </TabsContent>
 
           <TabsContent value="metrics" className="mt-8">
             <div className="max-w-6xl mx-auto">
@@ -185,12 +184,13 @@ const Track = () => {
             </div>
           </TabsContent>
         </Tabs>
+        )}
       </main>
 
       {/* Footer */}
       <footer className="container mx-auto px-6 py-8 text-center">
         <p className="text-sm font-body text-muted-foreground">
-          Breathe deeply. Stay present. Find your flow.
+          Professional attention analytics. Data-driven insights.
         </p>
       </footer>
     </div>
