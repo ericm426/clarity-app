@@ -107,25 +107,23 @@ export const useFaceTracking = () => {
           // Calculate head pose angles
           const headPose = calculateHeadPose(landmarks);
           
-          // Calculate overall head alignment score (0-1)
+          // Calculate overall head alignment score (0-1) with more lenient thresholds
           // Perfect alignment: pitch ≈ 0, yaw ≈ 0, roll ≈ 0
-          const pitchScore = Math.max(0, 1 - Math.abs(headPose.pitch) / 30);  // Allow ±30° before penalty
-          const yawScore = Math.max(0, 1 - Math.abs(headPose.yaw) / 40);      // Allow ±40° before penalty
-          const rollScore = Math.max(0, 1 - Math.abs(headPose.roll) / 25);    // Allow ±25° before penalty
+          const pitchScore = Math.max(0, 1 - Math.abs(headPose.pitch) / 45);  // Allow ±45° before full penalty
+          const yawScore = Math.max(0, 1 - Math.abs(headPose.yaw) / 50);      // Allow ±50° before full penalty
+          const rollScore = Math.max(0, 1 - Math.abs(headPose.roll) / 35);    // Allow ±35° before full penalty
           const headAlignmentScore = (pitchScore + yawScore + rollScore) / 3;
           
-          // Focus based purely on head pose alignment
-          if (headAlignmentScore > 0.85) {
-            currentFocus = 95; // Facing camera directly
-          } else if (headAlignmentScore > 0.70) {
-            currentFocus = 80; // Slightly turned
-          } else if (headAlignmentScore > 0.50) {
-            currentFocus = 60; // Moderately turned away
-          } else if (headAlignmentScore > 0.30) {
-            currentFocus = 40; // Looking away significantly
+          // Convert alignment score to focus percentage (more continuous)
+          // Scale from 0.5-1.0 alignment to 30-95% focus
+          if (headAlignmentScore > 0.5) {
+            currentFocus = Math.round(30 + (headAlignmentScore - 0.5) * 130);
           } else {
-            currentFocus = 25; // Head turned away from screen
+            currentFocus = Math.round(headAlignmentScore * 60);
           }
+          
+          // Clamp to valid range
+          currentFocus = Math.max(25, Math.min(95, currentFocus));
         }
         
         focusHistoryRef.current.push(currentFocus);
