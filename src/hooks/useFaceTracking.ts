@@ -48,6 +48,36 @@ export const useFaceTracking = () => {
     return (vertical1 + vertical2) / (2.0 * horizontal);
   };
 
+  // Calculate head pose angles (pitch, yaw, roll) in degrees
+  const calculateHeadPose = (landmarks: any): { pitch: number; yaw: number; roll: number } => {
+    // Key facial landmarks for head pose
+    const noseTip = landmarks[1];        // Nose tip
+    const chin = landmarks[152];         // Chin
+    const leftEye = landmarks[33];       // Left eye outer corner
+    const rightEye = landmarks[263];     // Right eye outer corner
+    const leftMouth = landmarks[61];     // Left mouth corner
+    const rightMouth = landmarks[291];   // Right mouth corner
+    
+    // Calculate yaw (left-right rotation)
+    const eyeCenter = {
+      x: (leftEye.x + rightEye.x) / 2,
+      y: (leftEye.y + rightEye.y) / 2,
+      z: (leftEye.z + rightEye.z) / 2
+    };
+    const noseToEyeCenter = noseTip.x - eyeCenter.x;
+    const yaw = Math.atan2(noseToEyeCenter, 0.1) * (180 / Math.PI);
+    
+    // Calculate pitch (up-down rotation)
+    const noseToEyeY = noseTip.y - eyeCenter.y;
+    const pitch = Math.atan2(noseToEyeY, 0.3) * (180 / Math.PI);
+    
+    // Calculate roll (head tilt to side)
+    const eyeSlope = (rightEye.y - leftEye.y) / (rightEye.x - leftEye.x);
+    const roll = Math.atan(eyeSlope) * (180 / Math.PI);
+    
+    return { pitch, yaw, roll };
+  };
+
   const startTracking = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -114,23 +144,31 @@ export const useFaceTracking = () => {
           const rightEAR = calculateEAR(rightEyePoints);
           const avgEAR = (leftEAR + rightEAR) / 2;
           
-          // Calculate head pose (check if facing camera)
-          const noseTip = landmarks[1];
-          const faceCenter = landmarks[168];
-          const headTilt = Math.abs(noseTip.x - faceCenter.x);
+          // Calculate head pose angles
+          const headPose = calculateHeadPose(landmarks);
           
-          // Classify focus based on EAR thresholds
+          // Calculate overall head alignment score (0-1)
+          // Perfect alignment: pitch ≈ 0, yaw ≈ 0, roll ≈ 0
+          const pitchScore = Math.max(0, 1 - Math.abs(headPose.pitch) / 30);  // Allow ±30° before penalty
+          const yawScore = Math.max(0, 1 - Math.abs(headPose.yaw) / 40);      // Allow ±40° before penalty
+          const rollScore = Math.max(0, 1 - Math.abs(headPose.roll) / 25);    // Allow ±25° before penalty
+          const headAlignmentScore = (pitchScore + yawScore + rollScore) / 3;
+          
+          // Classify focus based on EAR and head pose
           // EAR > 0.25 = fully open eyes (alert)
           // EAR 0.2-0.25 = partially open (drowsy)
           // EAR < 0.2 = closed/blinking
-          if (avgEAR > 0.25 && headTilt < 0.1) {
-            currentFocus = 95; // Fully engaged
-          } else if (avgEAR > 0.20 && headTilt < 0.15) {
-            currentFocus = 75; // Moderately focused
-          } else if (avgEAR > 0.15) {
-            currentFocus = 50; // Drowsy or looking away
+          
+          if (avgEAR > 0.25 && headAlignmentScore > 0.8) {
+            currentFocus = 95; // Fully engaged - eyes open + facing camera
+          } else if (avgEAR > 0.25 && headAlignmentScore > 0.6) {
+            currentFocus = 80; // Good focus - eyes open but slightly turned
+          } else if (avgEAR > 0.20 && headAlignmentScore > 0.5) {
+            currentFocus = 65; // Moderate - drowsy or looking away slightly
+          } else if (avgEAR > 0.15 && headAlignmentScore > 0.3) {
+            currentFocus = 45; // Low - very drowsy or looking away
           } else {
-            currentFocus = 30; // Eyes closed or distracted
+            currentFocus = 25; // Minimal - eyes closed or head turned away
           }
         }
         
