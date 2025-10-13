@@ -1,0 +1,144 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Nudge Color System - Zen Minimalism */
+    --background: 176 33% 94%; /* #E8F4F3 Mist White */
+    --foreground: 174 29% 15%; /* #1A2E2C Charcoal Green */
+
+    --card: 180 100% 99%;
+    --card-foreground: 174 29% 15%;
+
+    --popover: 180 100% 99%;
+    --popover-foreground: 174 29% 15%;
+
+    --primary: 178 35% 28%; /* #2D5F5D Deep Teal */
+    --primary-foreground: 176 33% 94%;
+
+    --secondary: 176 33% 94%; /* Mist White */
+    --secondary-foreground: 174 29% 15%;
+
+    --muted: 180 20% 88%;
+    --muted-foreground: 174 15% 45%;
+
+    --accent: 35 41% 64%; /* #D4A574 Warm Sand */
+    --accent-foreground: 174 29% 15%;
+
+    --destructive: 11 48% 59%; /* #C17767 Terracotta */
+    --destructive-foreground: 176 33% 94%;
+
+    --border: 180 20% 85%;
+    --input: 180 20% 88%;
+    --ring: 178 35% 28%;
+
+    --radius: 12px;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    /* Dark mode maintains zen aesthetic with deeper tones */
+    --background: 174 29% 15%;
+    --foreground: 176 33% 94%;
+
+    --card: 174 25% 18%;
+    --card-foreground: 176 33% 94%;
+
+    --popover: 174 25% 18%;
+    --popover-foreground: 176 33% 94%;
+
+    --primary: 178 35% 28%;
+    --primary-foreground: 176 33% 94%;
+
+    --secondary: 174 25% 22%;
+    --secondary-foreground: 176 33% 94%;
+
+    --muted: 174 20% 25%;
+    --muted-foreground: 176 15% 65%;
+
+    --accent: 35 41% 64%;
+    --accent-foreground: 174 29% 15%;
+
+    --destructive: 11 48% 59%;
+    --destructive-foreground: 176 33% 94%;
+
+    --border: 174 20% 25%;
+    --input: 174 20% 25%;
+    --ring: 178 35% 38%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-headline;
+  }
+}
+
+/* Custom Animations - Zen Flow */
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.9;
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px hsl(var(--primary) / 0.6);
+  }
+}
