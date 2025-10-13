@@ -1,14 +1,14 @@
-import { useState, useEffect, useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { NudgeAlert } from '@/components/NudgeAlert';
-import { CameraPreview } from '@/components/CameraPreview';
-import { ActiveSessionSidebar } from '@/components/ActiveSessionSidebar';
-import { useFaceTracking } from '@/hooks/useFaceTracking';
-import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
-import Header from '@/components/Header';
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { useState, useEffect, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { NudgeAlert } from "@/components/NudgeAlert";
+import { CameraPreview } from "@/components/CameraPreview";
+import { ActiveSessionSidebar } from "@/components/ActiveSessionSidebar";
+import { useFaceTracking } from "@/hooks/useFaceTracking";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import Header from "@/components/Header";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 const Track = () => {
   const { isTracking, focusLevel, isFaceDetected, stream, startTracking, stopTracking } = useFaceTracking();
@@ -30,10 +30,12 @@ const Track = () => {
   // Check authentication
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) {
-        toast.error('Please sign in to access focus tracking');
-        navigate('/auth');
+        toast.error("Please sign in to access focus tracking");
+        navigate("/auth");
       }
     };
     checkAuth();
@@ -58,17 +60,17 @@ const Track = () => {
 
     const interval = setInterval(() => {
       setSessionDuration((prev) => prev + 1);
-      
+
       // Use ref to get current focus level
       const currentFocus = focusLevelRef.current;
       setFocusLevels((prev) => [...prev, currentFocus]);
-      
+
       // Track low focus duration
       if (currentFocus < 50) {
         setLowFocusDuration((prevDuration) => {
           const newDuration = prevDuration + 1;
           // Trigger nudge at 30 seconds
-          if (newDuration >= 30) {
+          if (newDuration >= 5) {
             setShowNudge(true);
             setNudgeCount((count) => count + 1);
             return 0; // Reset after nudge
@@ -85,46 +87,45 @@ const Track = () => {
 
   const handleStop = async () => {
     stopTracking();
-    
+
     // Save session data
     if (sessionStartTime && sessionDuration > 0) {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         if (!user) return;
 
-        const avgFocusLevel = focusLevels.length > 0
-          ? focusLevels.reduce((sum, level) => sum + level, 0) / focusLevels.length
-          : 0;
+        const avgFocusLevel =
+          focusLevels.length > 0 ? focusLevels.reduce((sum, level) => sum + level, 0) / focusLevels.length : 0;
 
-        const { error } = await supabase
-          .from('focus_sessions')
-          .insert({
-            user_id: user.id,
-            session_duration: sessionDuration,
-            nudge_count: nudgeCount,
-            average_focus_level: avgFocusLevel,
-            started_at: sessionStartTime.toISOString(),
-            ended_at: new Date().toISOString(),
-          });
+        const { error } = await supabase.from("focus_sessions").insert({
+          user_id: user.id,
+          session_duration: sessionDuration,
+          nudge_count: nudgeCount,
+          average_focus_level: avgFocusLevel,
+          started_at: sessionStartTime.toISOString(),
+          ended_at: new Date().toISOString(),
+        });
 
         if (error) throw error;
-        toast.success('Session saved successfully');
-        navigate('/dashboard');
+        toast.success("Session saved successfully");
+        navigate("/dashboard");
       } catch (error) {
-        console.error('Error saving session:', error);
-        toast.error('Failed to save session data');
+        console.error("Error saving session:", error);
+        toast.error("Failed to save session data");
       }
     } else {
-      navigate('/dashboard');
+      navigate("/dashboard");
     }
   };
 
   const handleTakeBreak = () => {
     setIsPaused(!isPaused);
     if (!isPaused) {
-      toast.info('Break started - session paused');
+      toast.info("Break started - session paused");
     } else {
-      toast.success('Session resumed');
+      toast.success("Session resumed");
     }
   };
 
