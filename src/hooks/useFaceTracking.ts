@@ -81,15 +81,23 @@ export const useFaceTracking = () => {
           // Calculate head pose normalized by face size
           const noseTip = landmarks[1];
           const faceCenter = landmarks[168];
-          const headTilt = Math.abs(noseTip.x - faceCenter.x) / eyeDistance;
+          const horizontalTilt = Math.abs(noseTip.x - faceCenter.x) / eyeDistance;
+          const verticalTilt = Math.abs(noseTip.y - faceCenter.y) / eyeDistance;
+          
+          // Combined head tilt metric
+          const totalHeadTilt = Math.sqrt(horizontalTilt * horizontalTilt + verticalTilt * verticalTilt);
           
           // Eyes open and facing camera = high focus
-          if (avgEyeOpenness > 0.08 && headTilt < 0.5) {
+          if (avgEyeOpenness > 0.08 && totalHeadTilt < 0.25) {
             currentFocus = 95;
-          } else if (avgEyeOpenness > 0.05) {
-            currentFocus = 70; // Eyes open but not fully engaged
+          } else if (avgEyeOpenness > 0.08 && totalHeadTilt < 0.4) {
+            currentFocus = 75; // Eyes open but slight head turn
+          } else if (avgEyeOpenness > 0.05 && totalHeadTilt < 0.4) {
+            currentFocus = 55; // Eyes open but moderate head turn
+          } else if (totalHeadTilt >= 0.4) {
+            currentFocus = 30; // Head significantly turned away
           } else {
-            currentFocus = 40; // Eyes closed or looking away
+            currentFocus = 35; // Eyes closed or looking away
           }
         }
         
