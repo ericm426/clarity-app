@@ -81,31 +81,33 @@ export const useFaceTracking = () => {
           // Calculate head pose normalized by face size
           const noseTip = landmarks[1];
           const faceCenter = landmarks[168];
-          const horizontalTilt = Math.abs(noseTip.x - faceCenter.x) / eyeDistance;
-          const verticalTilt = Math.abs(noseTip.y - faceCenter.y) / eyeDistance;
-          
-          // Combined head tilt metric
-          const totalHeadTilt = Math.sqrt(horizontalTilt * horizontalTilt + verticalTilt * verticalTilt);
-          
+          // 3D head pose using depth (z) for yaw/pitch
+          const leftEyeCorner = landmarks[33];
+          const rightEyeCorner = landmarks[263];
+          const yaw = Math.abs(leftEyeCorner.z - rightEyeCorner.z) / eyeDistance; // left/right turn
+          const pitch = Math.abs(noseTip.z - faceCenter.z) / eyeDistance; // up/down nod
+
+          const totalHeadMotion = Math.hypot(yaw, pitch);
+
           // Debug logging
           console.log('Face metrics:', {
             avgEyeOpenness: avgEyeOpenness.toFixed(3),
-            horizontalTilt: horizontalTilt.toFixed(3),
-            verticalTilt: verticalTilt.toFixed(3),
-            totalHeadTilt: totalHeadTilt.toFixed(3)
+            yaw: yaw.toFixed(3),
+            pitch: pitch.toFixed(3),
+            totalHeadMotion: totalHeadMotion.toFixed(3)
           });
           
           // Eyes open and facing camera = high focus
-          if (avgEyeOpenness > 0.08 && totalHeadTilt < 0.4) {
+          if (avgEyeOpenness > 0.08 && totalHeadMotion < 0.15) {
             currentFocus = 95;
-          } else if (avgEyeOpenness > 0.08 && totalHeadTilt < 0.6) {
-            currentFocus = 70; // Eyes open but slight head turn
-          } else if (avgEyeOpenness > 0.05 && totalHeadTilt < 0.6) {
-            currentFocus = 50; // Eyes open but moderate head turn
-          } else if (totalHeadTilt >= 0.6) {
-            currentFocus = 25; // Head significantly turned away
+          } else if (avgEyeOpenness > 0.08 && totalHeadMotion < 0.28) {
+            currentFocus = 75; // Eyes open but slight head motion
+          } else if (avgEyeOpenness > 0.05 && totalHeadMotion < 0.28) {
+            currentFocus = 55; // Eyes open but moderate head motion
+          } else if (totalHeadMotion >= 0.28) {
+            currentFocus = 30; // Head significantly turned or nodded away
           } else {
-            currentFocus = 30; // Eyes closed or looking away
+            currentFocus = 35; // Eyes closed or looking away
           }
           
           console.log('Focus calculated:', currentFocus);
