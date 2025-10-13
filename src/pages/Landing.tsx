@@ -1,12 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Eye, Brain, Target, Zap } from 'lucide-react';
+import Header from '@/components/Header';
 
 const Landing = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
+      <Header />
       {/* Hero Section */}
       <section className="container mx-auto px-6 py-20">
         <div className="text-center max-w-4xl mx-auto">
