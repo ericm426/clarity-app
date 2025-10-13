@@ -91,8 +91,8 @@ export const useFaceTracking = () => {
         
         focusHistoryRef.current.push(currentFocus);
 
-        // Keep last 30 seconds of history (assuming ~30fps = ~900 samples for 30s)
-        if (focusHistoryRef.current.length > 900) {
+        // Keep last 5 seconds of history (assuming ~30fps = ~150 samples for 5s)
+        if (focusHistoryRef.current.length > 150) {
           focusHistoryRef.current.shift();
         }
 
