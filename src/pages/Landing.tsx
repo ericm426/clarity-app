@@ -1,10 +1,34 @@
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Eye, Brain, Target, Zap } from 'lucide-react';
 import Header from '@/components/Header';
+import { supabase } from '@/integrations/supabase/client';
+import { User } from '@supabase/supabase-js';
 
 const Landing = () => {
   const navigate = useNavigate();
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleGetStarted = () => {
+    if (user) {
+      navigate('/dashboard');
+    } else {
+      navigate('/auth');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
@@ -23,7 +47,7 @@ const Landing = () => {
             and professional insights for serious students and professionals.
           </p>
           <Button
-            onClick={() => navigate('/auth')}
+            onClick={handleGetStarted}
             size="lg"
             className="font-body font-medium px-12 py-6 text-lg rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all"
           >
@@ -141,7 +165,7 @@ const Landing = () => {
             Join thousands of users who have improved their concentration and productivity
           </p>
           <Button
-            onClick={() => navigate('/auth')}
+            onClick={handleGetStarted}
             size="lg"
             className="font-body font-medium px-12 py-6 text-lg rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all"
           >
