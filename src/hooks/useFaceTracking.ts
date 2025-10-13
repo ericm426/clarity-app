@@ -24,6 +24,7 @@ export const useFaceTracking = () => {
   const cameraRef = useRef<Camera | null>(null);
   const focusHistoryRef = useRef<number[]>([]);
   const lastDetectionTimeRef = useRef<number>(Date.now());
+  const lookingDownDurationRef = useRef<number>(0); // Track how long user is looking down
 
   // Calculate Euclidean distance between two 3D points
   const calculateDistance = (p1: any, p2: any): number => {
@@ -107,25 +108,44 @@ export const useFaceTracking = () => {
           // Calculate head pose angles
           const headPose = calculateHeadPose(landmarks);
           
-          // Calculate overall head alignment score (0-1) with very lenient thresholds
-          // These are calibrated for normal screen viewing posture
-          const pitchScore = Math.max(0, 1 - Math.abs(headPose.pitch) / 60);  // Allow ±60° 
-          const yawScore = Math.max(0, 1 - Math.abs(headPose.yaw) / 70);      // Allow ±70° 
-          const rollScore = Math.max(0, 1 - Math.abs(headPose.roll) / 50);    // Allow ±50° 
-          const headAlignmentScore = (pitchScore + yawScore + rollScore) / 3;
+          // Track sustained downward gaze (distraction indicator)
+          if (headPose.pitch > 15) { // Looking down more than 15 degrees
+            lookingDownDurationRef.current += 1; // Increment by frame (~30fps)
+          } else {
+            lookingDownDurationRef.current = 0; // Reset if looking up
+          }
+          
+          // Calculate individual angle penalties with stricter thresholds
+          const pitchScore = Math.max(0, 1 - Math.abs(headPose.pitch) / 35);  // ±35° tolerance
+          const yawScore = Math.max(0, 1 - Math.abs(headPose.yaw) / 40);      // ±40° tolerance
+          const rollScore = Math.max(0, 1 - Math.abs(headPose.roll) / 30);    // ±30° tolerance
+          
+          // Extra penalty for looking to the side or down
+          let sidePenalty = 0;
+          if (Math.abs(headPose.yaw) > 25) {
+            sidePenalty = 0.15; // 15% penalty for looking to side
+          }
+          
+          let downPenalty = 0;
+          if (headPose.pitch > 15) {
+            downPenalty = 0.10; // 10% base penalty for looking down
+            
+            // Additional penalty if looking down for extended period (10-15+ seconds = 300-450 frames at 30fps)
+            if (lookingDownDurationRef.current > 300) {
+              downPenalty += 0.20; // Extra 20% penalty for sustained downward gaze
+            }
+          }
+          
+          const headAlignmentScore = Math.max(0, (pitchScore + yawScore + rollScore) / 3 - sidePenalty - downPenalty);
           
           // Convert alignment score to focus percentage
-          // More generous scaling: alignment 0.6+ should give 80%+ focus
-          if (headAlignmentScore > 0.4) {
-            // Map 0.4-1.0 to 50-95%
-            currentFocus = Math.round(50 + (headAlignmentScore - 0.4) * 75);
-          } else {
-            // Map 0-0.4 to 25-50%
-            currentFocus = Math.round(25 + headAlignmentScore * 62.5);
-          }
+          // Map 0-1 alignment to 30-95% focus with better distribution
+          currentFocus = Math.round(30 + headAlignmentScore * 65);
           
           // Clamp to valid range
           currentFocus = Math.max(25, Math.min(95, currentFocus));
+        } else {
+          lookingDownDurationRef.current = 0; // Reset when face not detected
         }
         
         focusHistoryRef.current.push(currentFocus);
@@ -203,6 +223,7 @@ export const useFaceTracking = () => {
     }
 
     focusHistoryRef.current = [];
+    lookingDownDurationRef.current = 0;
 
     setState({
       isTracking: false,
