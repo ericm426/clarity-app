@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { BreathingCircle } from '@/components/BreathingCircle';
 import { FocusStats } from '@/components/FocusStats';
 import { NudgeAlert } from '@/components/NudgeAlert';
 import { CameraPreview } from '@/components/CameraPreview';
 import { useFaceTracking } from '@/hooks/useFaceTracking';
-import { Play, Square, LogOut } from 'lucide-react';
+import { Play, Square } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import Header from '@/components/Header';
 
 const Track = () => {
   const { isTracking, focusLevel, isFaceDetected, stream, startTracking, stopTracking } = useFaceTracking();
@@ -69,38 +69,10 @@ const Track = () => {
     stopTracking();
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    toast.success('Signed out successfully');
-    navigate('/');
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/80 flex flex-col">
+      <Header />
       <NudgeAlert isVisible={showNudge} onDismiss={() => setShowNudge(false)} />
-
-      {/* Header */}
-      <header className="container mx-auto px-6 py-8">
-        <div className="flex justify-between items-center">
-          <div className="text-center flex-1">
-            <h1 className="text-5xl md:text-6xl font-headline font-bold text-foreground mb-2">
-              Nudge
-            </h1>
-            <p className="text-lg font-body text-muted-foreground tracking-wide">
-              The Mindful Focus System
-            </p>
-          </div>
-          <Button
-            onClick={handleLogout}
-            variant="ghost"
-            size="sm"
-            className="font-body"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Sign Out
-          </Button>
-        </div>
-      </header>
 
       {/* Main Content */}
       <main className="container mx-auto px-6 flex-1 flex flex-col items-center justify-center gap-16">
@@ -111,19 +83,6 @@ const Track = () => {
             <CameraPreview stream={stream} />
           </div>
         )}
-
-        {/* Breathing Circle */}
-        <div className="flex flex-col items-center gap-8">
-          <BreathingCircle isFocused={isFaceDetected} focusLevel={focusLevel} />
-          
-          {isTracking && (
-            <p className="text-sm font-body text-center max-w-md text-muted-foreground">
-              {isFaceDetected
-                ? 'You are focused. Stay present with your breath.'
-                : 'Look at the screen and find your center.'}
-            </p>
-          )}
-        </div>
 
         {/* Controls */}
         <div className="flex gap-4">
