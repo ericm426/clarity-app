@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { NudgeAlert } from '@/components/NudgeAlert';
 import { CameraPreview } from '@/components/CameraPreview';
@@ -19,7 +19,13 @@ const Track = () => {
   const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
   const [focusLevels, setFocusLevels] = useState<number[]>([]);
   const [isPaused, setIsPaused] = useState(false);
+  const focusLevelRef = useRef(focusLevel);
   const navigate = useNavigate();
+
+  // Keep ref in sync with current focus level
+  useEffect(() => {
+    focusLevelRef.current = focusLevel;
+  }, [focusLevel]);
 
   // Check authentication
   useEffect(() => {
@@ -52,28 +58,30 @@ const Track = () => {
 
     const interval = setInterval(() => {
       setSessionDuration((prev) => prev + 1);
-      setFocusLevels((prev) => [...prev, focusLevel]);
+      
+      // Use ref to get current focus level
+      const currentFocus = focusLevelRef.current;
+      setFocusLevels((prev) => [...prev, currentFocus]);
+      
+      // Track low focus duration
+      if (currentFocus < 50) {
+        setLowFocusDuration((prevDuration) => {
+          const newDuration = prevDuration + 1;
+          // Trigger nudge at 30 seconds
+          if (newDuration >= 30) {
+            setShowNudge(true);
+            setNudgeCount((count) => count + 1);
+            return 0; // Reset after nudge
+          }
+          return newDuration;
+        });
+      } else {
+        setLowFocusDuration(0);
+      }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isTracking, focusLevel, isPaused]);
-
-  // Nudge system - trigger when focus < 50% for 30+ seconds
-  useEffect(() => {
-    if (!isTracking || isPaused) return;
-
-    if (focusLevel < 50) {
-      setLowFocusDuration((prev) => prev + 1);
-
-      if (lowFocusDuration >= 30 && !showNudge) {
-        setShowNudge(true);
-        setNudgeCount((prev) => prev + 1);
-        setLowFocusDuration(0);
-      }
-    } else {
-      setLowFocusDuration(0);
-    }
-  }, [focusLevel, isTracking, lowFocusDuration, showNudge, isPaused]);
+  }, [isTracking, isPaused]);
 
   const handleStop = async () => {
     stopTracking();
