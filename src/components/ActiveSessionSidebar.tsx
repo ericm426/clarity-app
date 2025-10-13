@@ -1,13 +1,14 @@
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { LineChart, Line, ResponsiveContainer, YAxis } from 'recharts';
-import { Square, Coffee } from 'lucide-react';
+import { Square, Coffee, Play } from 'lucide-react';
 
 interface ActiveSessionSidebarProps {
   sessionDuration: number;
   focusLevel: number;
   nudgeCount: number;
   focusHistory: number[];
+  isPaused: boolean;
   onEndSession: () => void;
   onTakeBreak: () => void;
 }
@@ -17,6 +18,7 @@ export const ActiveSessionSidebar = ({
   focusLevel,
   nudgeCount,
   focusHistory,
+  isPaused,
   onEndSession,
   onTakeBreak
 }: ActiveSessionSidebarProps) => {
@@ -113,8 +115,17 @@ export const ActiveSessionSidebar = ({
           variant="outline"
           className="w-full font-body font-medium justify-start"
         >
-          <Coffee className="w-4 h-4 mr-2" />
-          Take break
+          {isPaused ? (
+            <>
+              <Play className="w-4 h-4 mr-2" />
+              Resume
+            </>
+          ) : (
+            <>
+              <Coffee className="w-4 h-4 mr-2" />
+              Take break
+            </>
+          )}
         </Button>
       </div>
     </div>

@@ -17,6 +17,7 @@ const Track = () => {
   const [lowFocusDuration, setLowFocusDuration] = useState(0);
   const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
   const [focusLevels, setFocusLevels] = useState<number[]>([]);
+  const [isPaused, setIsPaused] = useState(false);
   const navigate = useNavigate();
 
   // Check authentication
@@ -46,7 +47,7 @@ const Track = () => {
 
   // Session timer and focus level tracking
   useEffect(() => {
-    if (!isTracking) return;
+    if (!isTracking || isPaused) return;
 
     const interval = setInterval(() => {
       setSessionDuration((prev) => prev + 1);
@@ -54,11 +55,11 @@ const Track = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isTracking, focusLevel]);
+  }, [isTracking, focusLevel, isPaused]);
 
   // Nudge system - trigger when focus < 50% for 30+ seconds
   useEffect(() => {
-    if (!isTracking) return;
+    if (!isTracking || isPaused) return;
 
     if (focusLevel < 50) {
       setLowFocusDuration((prev) => prev + 1);
@@ -71,7 +72,7 @@ const Track = () => {
     } else {
       setLowFocusDuration(0);
     }
-  }, [focusLevel, isTracking, lowFocusDuration, showNudge]);
+  }, [focusLevel, isTracking, lowFocusDuration, showNudge, isPaused]);
 
   const handleStop = async () => {
     stopTracking();
@@ -110,7 +111,12 @@ const Track = () => {
   };
 
   const handleTakeBreak = () => {
-    toast.info('Break started - session paused');
+    setIsPaused(!isPaused);
+    if (!isPaused) {
+      toast.info('Break started - session paused');
+    } else {
+      toast.success('Session resumed');
+    }
   };
 
   return (
@@ -139,6 +145,7 @@ const Track = () => {
               focusLevel={focusLevel}
               nudgeCount={nudgeCount}
               focusHistory={focusLevels}
+              isPaused={isPaused}
               onEndSession={handleStop}
               onTakeBreak={handleTakeBreak}
             />
