@@ -98,13 +98,13 @@ export const useFaceTracking = () => {
           });
           
           // Eyes open and facing camera = high focus
-          if (avgEyeOpenness > 0.08 && totalHeadMotion < 0.15) {
+          if (avgEyeOpenness > 0.08 && totalHeadMotion < 0.3) {
             currentFocus = 95;
-          } else if (avgEyeOpenness > 0.08 && totalHeadMotion < 0.28) {
-            currentFocus = 75; // Eyes open but slight head motion
-          } else if (avgEyeOpenness > 0.05 && totalHeadMotion < 0.28) {
-            currentFocus = 55; // Eyes open but moderate head motion
-          } else if (totalHeadMotion >= 0.28) {
+          } else if (avgEyeOpenness > 0.08 && totalHeadMotion < 0.5) {
+            currentFocus = 70; // Eyes open but slight head motion
+          } else if (avgEyeOpenness > 0.05 && totalHeadMotion < 0.5) {
+            currentFocus = 50; // Eyes somewhat closed or moderate head motion
+          } else if (totalHeadMotion >= 0.5) {
             currentFocus = 30; // Head significantly turned or nodded away
           } else {
             currentFocus = 35; // Eyes closed or looking away
