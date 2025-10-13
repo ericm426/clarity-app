@@ -8,36 +8,39 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Nudge Color System - Zen Minimalism */
-    --background: 176 33% 94%; /* #E8F4F3 Mist White */
-    --foreground: 174 29% 15%; /* #1A2E2C Charcoal Green */
+    /* Clarity Color System - Professional Data Intelligence */
+    --background: 210 40% 98%; /* #F8FAFC Slate 50 */
+    --foreground: 222 47% 11%; /* #0F172A Slate 900 */
 
-    --card: 180 100% 99%;
-    --card-foreground: 174 29% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
 
-    --popover: 180 100% 99%;
-    --popover-foreground: 174 29% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 178 35% 28%; /* #2D5F5D Deep Teal */
-    --primary-foreground: 176 33% 94%;
+    --primary: 221 83% 53%; /* #3B82F6 Blue 500 */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 176 33% 94%; /* Mist White */
-    --secondary-foreground: 174 29% 15%;
+    --secondary: 215 20% 65%; /* Slate 400 */
+    --secondary-foreground: 222 47% 11%;
 
-    --muted: 180 20% 88%;
-    --muted-foreground: 174 15% 45%;
+    --muted: 214 32% 91%; /* Slate 200 */
+    --muted-foreground: 215 16% 47%; /* Slate 600 */
 
-    --accent: 35 41% 64%; /* #D4A574 Warm Sand */
-    --accent-foreground: 174 29% 15%;
+    --accent: 258 90% 66%; /* #8B5CF6 Purple 500 */
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 11 48% 59%; /* #C17767 Terracotta */
-    --destructive-foreground: 176 33% 94%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 180 20% 85%;
-    --input: 180 20% 88%;
-    --ring: 178 35% 28%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%;
 
-    --radius: 12px;
+    --success: 160 84% 39%; /* #10B981 Emerald 500 */
+    --warning: 38 92% 50%; /* #F59E0B Amber 500 */
+
+    --radius: 8px;
 
     --sidebar-background: 0 0% 98%;
 
@@ -57,34 +60,34 @@ All colors MUST be HSL.
   }
 
   .dark {
-    /* Dark mode maintains zen aesthetic with deeper tones */
-    --background: 174 29% 15%;
-    --foreground: 176 33% 94%;
+    /* Dark mode for professional data interface */
+    --background: 222 47% 11%; /* Slate 900 */
+    --foreground: 210 40% 98%;
 
-    --card: 174 25% 18%;
-    --card-foreground: 176 33% 94%;
+    --card: 217 33% 17%; /* Slate 800 */
+    --card-foreground: 210 40% 98%;
 
-    --popover: 174 25% 18%;
-    --popover-foreground: 176 33% 94%;
+    --popover: 217 33% 17%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 178 35% 28%;
-    --primary-foreground: 176 33% 94%;
+    --primary: 221 83% 53%; /* Blue 500 */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 174 25% 22%;
-    --secondary-foreground: 176 33% 94%;
+    --secondary: 215 25% 27%; /* Slate 700 */
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 174 20% 25%;
-    --muted-foreground: 176 15% 65%;
+    --muted: 215 28% 17%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 35 41% 64%;
-    --accent-foreground: 174 29% 15%;
+    --accent: 258 90% 66%; /* Purple 500 */
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 11 48% 59%;
-    --destructive-foreground: 176 33% 94%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 174 20% 25%;
-    --input: 174 20% 25%;
-    --ring: 178 35% 38%;
+    --border: 215 28% 17%;
+    --input: 215 28% 17%;
+    --ring: 221 83% 53%;
   }
 }
 

@@ -14,9 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        headline: ['"Crimson Pro"', 'serif'],
+        headline: ['"Inter Tight"', 'Inter', 'sans-serif'],
         body: ['Inter', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'monospace'],
+        mono: ['"SF Mono"', '"JetBrains Mono"', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -98,6 +98,16 @@ export default {
         '18': '4.5rem',
         '88': '22rem',
         '128': '32rem',
+      },
+      fontSize: {
+        'xs': ['13px', { lineHeight: '1.5' }],
+        'sm': ['14px', { lineHeight: '1.5' }],
+        'base': ['15px', { lineHeight: '1.6' }],
+        'lg': ['18px', { lineHeight: '1.6' }],
+        'xl': ['24px', { lineHeight: '1.4' }],
+        '2xl': ['32px', { lineHeight: '1.3' }],
+        '3xl': ['40px', { lineHeight: '1.2' }],
+        '4xl': ['48px', { lineHeight: '1.1' }],
       },
       transitionTimingFunction: {
         'zen': 'cubic-bezier(0.4, 0, 0.2, 1)',

@@ -13,14 +13,14 @@ const Landing = () => {
       <section className="container mx-auto px-6 py-20">
         <div className="text-center max-w-4xl mx-auto">
           <h1 className="text-6xl md:text-7xl font-headline font-bold text-foreground mb-6">
-            Nudge
+            Clarity
           </h1>
           <p className="text-2xl md:text-3xl font-body text-muted-foreground mb-8">
-            AI-Powered Focus Tracking for the Modern Mind
+            Professional Focus Analytics Platform
           </p>
           <p className="text-lg font-body text-muted-foreground mb-12 max-w-2xl mx-auto">
-            Stay present, maintain focus, and build better habits with intelligent eye tracking technology 
-            that gently guides you back when your attention drifts.
+            Transform your attention into valuable business intelligence. Clean dashboards, data visualization excellence, 
+            and professional insights for serious students and professionals.
           </p>
           <Button
             onClick={() => navigate('/auth')}
@@ -153,7 +153,7 @@ const Landing = () => {
       {/* Footer */}
       <footer className="container mx-auto px-6 py-8 text-center border-t">
         <p className="text-sm font-body text-muted-foreground">
-          Breathe deeply. Stay present. Find your flow.
+          Professional attention analytics. Data-driven insights.
         </p>
       </footer>
     </div>

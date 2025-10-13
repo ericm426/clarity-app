@@ -41,7 +41,7 @@ const Header = () => {
             className="text-2xl font-headline font-bold text-foreground cursor-pointer"
             onClick={() => navigate('/')}
           >
-            Nudge
+            Clarity
           </h1>
           <button
             onClick={handleFocusMetricsClick}
