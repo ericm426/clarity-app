@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import Header from '@/components/Header';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 
 const Track = () => {
   const { isTracking, focusLevel, isFaceDetected, stream, startTracking, stopTracking } = useFaceTracking();
@@ -120,46 +121,45 @@ const Track = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-background/80 flex flex-col">
-      <Header />
-      <NudgeAlert isVisible={showNudge} onDismiss={() => setShowNudge(false)} />
+    <SidebarProvider>
+      <div className="min-h-screen bg-gradient-to-b from-background to-background/80 flex flex-col w-full">
+        <Header />
+        <NudgeAlert isVisible={showNudge} onDismiss={() => setShowNudge(false)} />
 
-      {/* Main Content */}
-      <main className="container mx-auto px-6 py-8 flex-1">
-        {/* Active Session Split Screen */}
-        <div className="flex gap-8 max-w-7xl mx-auto justify-center">
-          {/* Camera Preview - Centered */}
-          <div className="flex flex-col items-center gap-6">
+        <div className="flex w-full flex-1">
+          {/* Main Content - Camera Preview */}
+          <main className="flex-1 container mx-auto px-6 py-8 flex flex-col items-center justify-center">
             {stream && (
-              <div className="flex flex-col items-center gap-2">
-                <p className="text-sm font-body text-muted-foreground mb-2">Camera Preview</p>
+              <div className="flex flex-col items-center gap-4 w-full">
+                <div className="flex items-center gap-4 w-full max-w-3xl">
+                  <SidebarTrigger className="shrink-0" />
+                  <p className="text-sm font-body text-muted-foreground">Camera Preview</p>
+                </div>
                 <CameraPreview stream={stream} />
               </div>
             )}
-          </div>
+          </main>
 
           {/* Right: Active Session Sidebar */}
-          <aside className="w-full max-w-sm">
-            <ActiveSessionSidebar
-              sessionDuration={sessionDuration}
-              focusLevel={focusLevel}
-              nudgeCount={nudgeCount}
-              focusHistory={focusLevels}
-              isPaused={isPaused}
-              onEndSession={handleStop}
-              onTakeBreak={handleTakeBreak}
-            />
-          </aside>
+          <ActiveSessionSidebar
+            sessionDuration={sessionDuration}
+            focusLevel={focusLevel}
+            nudgeCount={nudgeCount}
+            focusHistory={focusLevels}
+            isPaused={isPaused}
+            onEndSession={handleStop}
+            onTakeBreak={handleTakeBreak}
+          />
         </div>
-      </main>
 
-      {/* Footer */}
-      <footer className="container mx-auto px-6 py-8 text-center">
-        <p className="text-sm font-body text-muted-foreground">
-          Professional attention analytics. Data-driven insights.
-        </p>
-      </footer>
-    </div>
+        {/* Footer */}
+        <footer className="container mx-auto px-6 py-4 text-center border-t">
+          <p className="text-sm font-body text-muted-foreground">
+            Professional attention analytics. Data-driven insights.
+          </p>
+        </footer>
+      </div>
+    </SidebarProvider>
   );
 };
 

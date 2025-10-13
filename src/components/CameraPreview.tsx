@@ -14,7 +14,7 @@ export const CameraPreview = ({ stream }: CameraPreviewProps) => {
   }, [stream]);
 
   return (
-    <div className="relative w-64 h-48 rounded-lg overflow-hidden border-2 border-border bg-muted">
+    <div className="relative w-full max-w-3xl h-[500px] rounded-lg overflow-hidden border-2 border-border bg-muted shadow-lg">
       <video
         ref={videoRef}
         autoPlay
