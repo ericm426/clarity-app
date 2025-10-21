@@ -315,22 +315,10 @@ export const useFaceTracking = () => {
         }
 
         const faceDetected = results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0;
-
-        // Debug: Log face detection results occasionally
-        if (frameCountRef.current % 30 === 0) {
-          console.log('Face Detection:', {
-            faceDetected,
-            landmarksCount: results.multiFaceLandmarks?.length || 0,
-            frameCount: frameCountRef.current
-          });
-        }
-
-        let currentFocus = 0; // Default low focus when no face
-        let eyeOpenness = 0;
-        let headPoseAngle = 90;
-        let eyesOpen = false;
-        const faceConfidence = faceDetected ? 1 : 0;
-
+        
+        // Calculate focus level based on face detection and facial metrics
+        let currentFocus = 30; // Default low focus when no face
+        
         if (faceDetected) {
           const landmarks = results.multiFaceLandmarks[0];
 

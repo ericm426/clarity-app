@@ -30,7 +30,9 @@ const Track = () => {
   // Check authentication and load average distractions
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) {
         toast.error('Please sign in to access focus tracking');
         navigate('/auth');
@@ -88,6 +90,7 @@ const Track = () => {
     const interval = setInterval(() => {
       setSessionDuration((prev) => prev + 1);
 
+
       // Use ref to get current focus level
       const currentFocus = focusLevelRef.current;
       setFocusLevels((prev) => [...prev, currentFocus]);
@@ -126,16 +129,17 @@ const Track = () => {
 
   const handleStop = async () => {
     stopTracking();
-    
+
     // Save session data
     if (sessionStartTime && sessionDuration > 0) {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         if (!user) return;
 
-        const avgFocusLevel = focusLevels.length > 0
-          ? focusLevels.reduce((sum, level) => sum + level, 0) / focusLevels.length
-          : 0;
+        const avgFocusLevel =
+          focusLevels.length > 0 ? focusLevels.reduce((sum, level) => sum + level, 0) / focusLevels.length : 0;
 
         const { error } = await supabase
           .from('focus_sessions')
@@ -149,23 +153,23 @@ const Track = () => {
           });
 
         if (error) throw error;
-        toast.success('Session saved successfully');
-        navigate('/dashboard');
+        toast.success("Session saved successfully");
+        navigate("/dashboard");
       } catch (error) {
-        console.error('Error saving session:', error);
-        toast.error('Failed to save session data');
+        console.error("Error saving session:", error);
+        toast.error("Failed to save session data");
       }
     } else {
-      navigate('/dashboard');
+      navigate("/dashboard");
     }
   };
 
   const handleTakeBreak = () => {
     setIsPaused(!isPaused);
     if (!isPaused) {
-      toast.info('Break started - session paused');
+      toast.info("Break started - session paused");
     } else {
-      toast.success('Session resumed');
+      toast.success("Session resumed");
     }
   };
 
