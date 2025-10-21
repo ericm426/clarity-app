@@ -10,6 +10,7 @@ interface ActiveSessionSidebarProps {
   nudgeCount: number;
   focusHistory: number[];
   isPaused: boolean;
+  avgDistractions?: number | null;
   onEndSession: () => void;
   onTakeBreak: () => void;
 }
@@ -20,6 +21,7 @@ export const ActiveSessionSidebar = ({
   nudgeCount,
   focusHistory,
   isPaused,
+  avgDistractions = null,
   onEndSession,
   onTakeBreak
 }: ActiveSessionSidebarProps) => {
@@ -35,8 +37,6 @@ export const ActiveSessionSidebar = ({
     index,
     focus: value
   }));
-
-  const avgDistractions = 3.2; // Platform average
 
   return (
     <Sidebar side="right" className="border-l w-80">
@@ -96,7 +96,7 @@ export const ActiveSessionSidebar = ({
               <Card className="p-4 bg-muted/30 border-border">
                 <p className="text-xs text-muted-foreground font-body mb-1">Avg per session</p>
                 <p className="text-2xl font-mono font-bold text-muted-foreground">
-                  {avgDistractions}
+                  {avgDistractions !== null ? avgDistractions : '—'}
                 </p>
               </Card>
             </div>

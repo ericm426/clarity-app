@@ -9,24 +9,27 @@ import Header from '@/components/Header';
 import { Profile } from '@/components/Profile';
 import { FindFriends } from '@/components/FindFriends';
 import { FriendProfile } from '@/components/FriendProfile';
-import { 
-  ArrowUp, 
-  ArrowDown, 
+import {
+  ArrowUp,
+  ArrowDown,
   Play,
   TrendingUp,
   Clock,
-  Zap
+  Zap,
+  AlertTriangle
 } from 'lucide-react';
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   ResponsiveContainer,
   Area,
-  AreaChart
+  AreaChart,
+  BarChart,
+  Bar
 } from 'recharts';
 import { format, subDays, startOfDay, parseISO } from 'date-fns';
 
@@ -84,13 +87,16 @@ const Dashboard = () => {
   const calculateStats = () => {
     const last7Days = sessions;
     const previous7Days = sessions.slice(0, Math.floor(sessions.length / 2));
-    
+
     const totalFocusHours = last7Days.reduce((sum, s) => sum + s.session_duration, 0) / 3600;
-    const avgSessionMins = last7Days.length > 0 
-      ? last7Days.reduce((sum, s) => sum + s.session_duration, 0) / last7Days.length / 60 
+    const avgSessionMins = last7Days.length > 0
+      ? last7Days.reduce((sum, s) => sum + s.session_duration, 0) / last7Days.length / 60
       : 0;
     const avgFocusLevel = last7Days.length > 0
       ? last7Days.reduce((sum, s) => sum + (s.average_focus_level || 0), 0) / last7Days.length
+      : 0;
+    const avgDistractions = last7Days.length > 0
+      ? last7Days.reduce((sum, s) => sum + (s.nudge_count || 0), 0) / last7Days.length
       : 0;
 
     const prevTotalHours = previous7Days.reduce((sum, s) => sum + s.session_duration, 0) / 3600;
@@ -100,20 +106,26 @@ const Dashboard = () => {
     const prevAvgFocus = previous7Days.length > 0
       ? previous7Days.reduce((sum, s) => sum + (s.average_focus_level || 0), 0) / previous7Days.length
       : 0;
+    const prevAvgDistractions = previous7Days.length > 0
+      ? previous7Days.reduce((sum, s) => sum + (s.nudge_count || 0), 0) / previous7Days.length
+      : 0;
 
-    const hoursChange = prevTotalHours > 0 
+    const hoursChange = prevTotalHours > 0
       ? ((totalFocusHours - prevTotalHours) / prevTotalHours * 100)
       : 0;
     const minsChange = avgSessionMins - prevAvgMins;
     const focusChange = avgFocusLevel - prevAvgFocus;
+    const distractionsChange = avgDistractions - prevAvgDistractions;
 
     return {
       totalFocusHours: totalFocusHours.toFixed(1),
       avgSessionMins: Math.round(avgSessionMins),
       efficiency: Math.round(avgFocusLevel),
+      avgDistractions: Math.round(avgDistractions * 10) / 10,
       hoursChange,
       minsChange,
-      focusChange
+      focusChange,
+      distractionsChange
     };
   };
 
@@ -211,8 +223,8 @@ const Dashboard = () => {
               </p>
             </div>
 
-        {/* 3-Column Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {/* 4-Column Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card className="p-6 border-border">
             <div className="flex items-start justify-between mb-4">
               <div>
@@ -293,6 +305,33 @@ const Dashboard = () => {
               <span className="text-muted-foreground">improvement</span>
             </div>
           </Card>
+
+          <Card className="p-6 border-border">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground font-body mb-1">
+                  Avg Distractions
+                </p>
+                <p className="text-4xl font-headline font-bold text-foreground">
+                  {stats.avgDistractions}
+                </p>
+              </div>
+              <div className="p-2 rounded-lg bg-warning/10">
+                <AlertTriangle className="w-5 h-5 text-warning" />
+              </div>
+            </div>
+            <div className="flex items-center gap-1 text-sm">
+              {stats.distractionsChange <= 0 ? (
+                <ArrowDown className="w-4 h-4 text-success" />
+              ) : (
+                <ArrowUp className="w-4 h-4 text-destructive" />
+              )}
+              <span className={stats.distractionsChange <= 0 ? 'text-success' : 'text-destructive'}>
+                {Math.abs(Math.round(stats.distractionsChange * 10) / 10)}
+              </span>
+              <span className="text-muted-foreground">per session</span>
+            </div>
+          </Card>
         </div>
 
         {/* Daily Breakdown Graph */}
@@ -343,33 +382,45 @@ const Dashboard = () => {
           </ResponsiveContainer>
         </Card>
 
-        {/* Heatmap */}
+        {/* Bar Chart */}
         <Card className="p-6 mb-8 border-border">
           <h2 className="text-lg font-headline font-semibold mb-6 text-foreground">
             Focus Patterns by Hour
           </h2>
-          <div className="grid grid-cols-12 gap-2">
-            {hourlyData.map(({ hour, intensity }) => {
-              const maxIntensity = Math.max(...hourlyData.map(d => d.intensity));
-              const opacity = maxIntensity > 0 ? intensity / maxIntensity : 0;
-              
-              return (
-                <div key={hour} className="flex flex-col items-center gap-1">
-                  <div 
-                    className="w-full aspect-square rounded transition-all hover:scale-110"
-                    style={{
-                      backgroundColor: `hsl(var(--primary) / ${opacity})`,
-                      border: opacity > 0 ? 'none' : '1px solid hsl(var(--border))'
-                    }}
-                    title={`${hour}:00 - ${intensity} sessions`}
-                  />
-                  <span className="text-xs text-muted-foreground font-mono">
-                    {hour}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={hourlyData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis
+                dataKey="hour"
+                stroke="hsl(var(--muted-foreground))"
+                style={{ fontSize: '12px' }}
+                tickFormatter={(value) => `${value}h`}
+              />
+              <YAxis
+                stroke="hsl(var(--muted-foreground))"
+                style={{ fontSize: '12px' }}
+                label={{ value: 'Sessions', angle: -90, position: 'insideLeft' }}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--card))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '8px'
+                }}
+                labelFormatter={(value) => `${value}:00`}
+                formatter={(value: any, name: string) => {
+                  if (name === 'intensity') return [value, 'Sessions'];
+                  if (name === 'focus') return [value + '%', 'Avg Focus'];
+                  return [value, name];
+                }}
+              />
+              <Bar
+                dataKey="intensity"
+                fill="hsl(var(--primary))"
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
         </Card>
 
         {/* Peer Comparison */}
