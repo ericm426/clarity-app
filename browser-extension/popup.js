@@ -1,7 +1,7 @@
 // Import our custom Supabase client (no external dependencies)
 import { supabase } from './supabase-client.js';
 
-const CLARITY_APP_URL = 'http://localhost:8080'; // Update for production
+const CLARITY_APP_URL = 'https://clarityaiapp.vercel.app/'; // Update for production
 
 // Update UI based on status
 async function updateUI() {

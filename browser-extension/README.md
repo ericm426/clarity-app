@@ -60,7 +60,7 @@ const SUPABASE_ANON_KEY = 'your-anon-key-here';
 ```javascript
 const SUPABASE_URL = 'https://your-project.supabase.co';
 const SUPABASE_ANON_KEY = 'your-anon-key-here';
-const CLARITY_APP_URL = 'http://localhost:5173'; // Update for production
+const CLARITY_APP_URL = 'https://clarityaiapp.vercel.app/'; // Update for production
 ```
 
 **blocked.html (line 128):**
