@@ -38,7 +38,7 @@ const Landing = () => {
       {/* Hero Section - Full viewport height */}
       <section className="min-h-screen flex flex-col items-center justify-center relative">
         <div className="text-center">
-          <h1 className="text-[12rem] md:text-[16rem] lg:text-[20rem] font-logo font-light tracking-tight text-foreground leading-none">
+          <h1 className="text-[8rem] md:text-[10rem] lg:text-[12rem] font-logo font-light tracking-tight text-foreground leading-none">
             <TypingAnimation 
               text="Clarity" 
               delay={300}
