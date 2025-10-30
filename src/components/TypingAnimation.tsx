@@ -28,10 +28,8 @@ export const TypingAnimation = ({
           setCurrentIndex(prev => prev + 1);
         }, charDelay);
         return () => clearTimeout(charTimeout);
-      } else {
-        // Hide cursor after typing is complete
-        setTimeout(() => setShowCursorState(false), 500);
       }
+      // Keep cursor blinking after typing is complete (removed the hide logic)
     }, currentIndex === 0 ? delay : 0);
 
     return () => clearTimeout(startTimeout);

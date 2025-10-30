@@ -9,6 +9,7 @@ import Header from '@/components/Header';
 import { Profile } from '@/components/Profile';
 import { FindFriends } from '@/components/FindFriends';
 import { FriendProfile } from '@/components/FriendProfile';
+import { FriendshipLeaderboard } from '@/components/FriendshipLeaderboard';
 import {
   ArrowUp,
   ArrowDown,
@@ -208,6 +209,7 @@ const Dashboard = () => {
         <Tabs defaultValue="dashboard" className="w-full">
           <TabsList className="mb-8">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+            <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="friends">Find Friends</TabsTrigger>
           </TabsList>
@@ -471,6 +473,10 @@ const Dashboard = () => {
                 Start Session
               </Button>
             </div>
+          </TabsContent>
+
+          <TabsContent value="leaderboard">
+            <FriendshipLeaderboard onViewProfile={setViewingFriendId} />
           </TabsContent>
 
           <TabsContent value="profile">
