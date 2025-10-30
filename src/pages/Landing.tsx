@@ -1,10 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { Eye, Brain, Target, Zap } from 'lucide-react';
+import { Eye, Brain, Target, Zap, ChevronDown } from 'lucide-react';
 import Header from '@/components/Header';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
+import { TypingAnimation } from '@/components/TypingAnimation';
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -31,133 +32,176 @@ const Landing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-background/80">
+    <div className="min-h-screen bg-background">
       <Header />
-      {/* Hero Section */}
-      <section className="container mx-auto px-6 py-20">
-        <div className="text-center max-w-4xl mx-auto">
-          <h1 className="text-6xl md:text-7xl font-headline font-bold text-foreground mb-6">
-            Clarity
+      
+      {/* Hero Section - Full viewport height */}
+      <section className="min-h-screen flex flex-col items-center justify-center relative">
+        <div className="text-center">
+          <h1 className="text-[12rem] md:text-[16rem] lg:text-[20rem] font-logo font-light tracking-tight text-foreground leading-none">
+            <TypingAnimation 
+              text="Clarity" 
+              delay={300}
+              charDelay={120}
+              showCursor={true}
+            />
           </h1>
-          <p className="text-2xl md:text-3xl font-body text-muted-foreground mb-8">
-            Professional Focus Analytics Platform
+          <p className="text-lg md:text-xl font-body text-muted-foreground tracking-wide uppercase mt-8 opacity-0 animate-[fade-in_0.6s_ease-out_1.5s_forwards]">
+            Professional Focus Analytics
           </p>
-          <p className="text-lg font-body text-muted-foreground mb-12 max-w-2xl mx-auto">
-            Transform your attention into valuable intelligence. Clean dashboards, data visualization excellence, 
-            and professional insights for serious students and professionals.
+        </div>
+        
+        {/* Scroll indicator */}
+        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 opacity-0 animate-[fade-in_0.6s_ease-out_2s_forwards]">
+          <ChevronDown className="w-8 h-8 text-muted-foreground animate-bounce" />
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section className="container mx-auto px-6 py-32 max-w-4xl">
+        <div className="space-y-8">
+          <h2 className="text-4xl md:text-5xl font-logo font-light text-foreground text-center mb-16">
+            Transform Your Attention
+          </h2>
+          <p className="text-xl md:text-2xl font-body text-muted-foreground leading-relaxed text-center">
+            Clarity turns your focus into valuable intelligence. Through sophisticated tracking 
+            and elegant data visualization, gain professional insights that matter.
           </p>
-          <Button
-            onClick={handleGetStarted}
-            size="lg"
-            className="font-body font-medium px-12 py-6 text-lg rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all"
-          >
-            Get Started For Free
-          </Button>
+          <div className="flex justify-center pt-8">
+            <Button
+              onClick={handleGetStarted}
+              size="lg"
+              className="font-body font-medium px-12 py-6 text-base bg-primary hover:bg-primary/90 text-primary-foreground transition-all"
+            >
+              Get Started
+            </Button>
+          </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="container mx-auto px-6 py-20">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div className="text-center p-6">
-            <h3 className="text-xl font-headline font-semibold mb-2">Smart Eye Tracking</h3>
-            <p className="text-muted-foreground font-body">
-              Advanced camera-based tracking monitors your focus in real-time
-            </p>
-          </div>
+      <section className="bg-muted/30 py-32">
+        <div className="container mx-auto px-6 max-w-6xl">
+          <div className="grid md:grid-cols-3 gap-16">
+            <div className="text-center space-y-4">
+              <div className="flex justify-center mb-4">
+                <div className="w-12 h-12 rounded-full bg-foreground/5 flex items-center justify-center">
+                  <Eye className="w-6 h-6 text-foreground" />
+                </div>
+              </div>
+              <h3 className="text-xl font-headline font-medium text-foreground">Intelligent Tracking</h3>
+              <p className="text-muted-foreground font-body leading-relaxed">
+                Advanced camera-based monitoring captures your attention patterns with precision
+              </p>
+            </div>
 
-          <div className="text-center p-6">
-            <h3 className="text-xl font-headline font-semibold mb-2">Gentle Nudges</h3>
-            <p className="text-muted-foreground font-body">
-              Receive mindful reminders when your attention starts to wander
-            </p>
-          </div>
+            <div className="text-center space-y-4">
+              <div className="flex justify-center mb-4">
+                <div className="w-12 h-12 rounded-full bg-foreground/5 flex items-center justify-center">
+                  <Brain className="w-6 h-6 text-foreground" />
+                </div>
+              </div>
+              <h3 className="text-xl font-headline font-medium text-foreground">Mindful Alerts</h3>
+              <p className="text-muted-foreground font-body leading-relaxed">
+                Subtle notifications guide you back when focus begins to drift
+              </p>
+            </div>
 
-          <div className="text-center p-6">
-            <h3 className="text-xl font-headline font-semibold mb-2">Focus Metrics</h3>
-            <p className="text-muted-foreground font-body">
-              Track your concentration levels and session performance
-            </p>
+            <div className="text-center space-y-4">
+              <div className="flex justify-center mb-4">
+                <div className="w-12 h-12 rounded-full bg-foreground/5 flex items-center justify-center">
+                  <Target className="w-6 h-6 text-foreground" />
+                </div>
+              </div>
+              <h3 className="text-xl font-headline font-medium text-foreground">Elegant Analytics</h3>
+              <p className="text-muted-foreground font-body leading-relaxed">
+                Clean, sophisticated dashboards reveal your productivity insights
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
       {/* How It Works */}
-      <section className="container mx-auto px-6 py-20">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-4xl font-headline font-bold mb-12">How It Works</h2>
-          <div className="space-y-8 text-left">
-            <div className="flex gap-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                1
-              </div>
-              <div>
-                <h3 className="text-xl font-headline font-semibold mb-2">Sign Up & Grant Camera Access</h3>
-                <p className="text-muted-foreground font-body">
-                  Create your free account and allow camera permissions for focus tracking
-                </p>
-              </div>
+      <section className="container mx-auto px-6 py-32 max-w-4xl">
+        <h2 className="text-4xl md:text-5xl font-logo font-light text-foreground text-center mb-20">
+          How It Works
+        </h2>
+        <div className="space-y-16">
+          <div className="flex gap-8 items-start">
+            <div className="flex-shrink-0 w-16 h-16 rounded-full border-2 border-foreground flex items-center justify-center">
+              <span className="text-2xl font-logo font-light">1</span>
             </div>
-
-            <div className="flex gap-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                2
-              </div>
-              <div>
-                <h3 className="text-xl font-headline font-semibold mb-2">Start Your Focus Session</h3>
-                <p className="text-muted-foreground font-body">
-                  Begin tracking to help you center your attention
-                </p>
-              </div>
+            <div className="pt-3">
+              <h3 className="text-2xl font-headline font-medium mb-3 text-foreground">Create Account</h3>
+              <p className="text-muted-foreground font-body text-lg leading-relaxed">
+                Sign up and grant camera access for intelligent focus tracking
+              </p>
             </div>
+          </div>
 
-            <div className="flex gap-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                3
-              </div>
-              <div>
-                <h3 className="text-xl font-headline font-semibold mb-2">Get Alerts</h3>
-                <p className="text-muted-foreground font-body">
-                  Receive alerts when your attention drifts away from the screen
-                </p>
-              </div>
+          <div className="flex gap-8 items-start">
+            <div className="flex-shrink-0 w-16 h-16 rounded-full border-2 border-foreground flex items-center justify-center">
+              <span className="text-2xl font-logo font-light">2</span>
             </div>
+            <div className="pt-3">
+              <h3 className="text-2xl font-headline font-medium mb-3 text-foreground">Begin Session</h3>
+              <p className="text-muted-foreground font-body text-lg leading-relaxed">
+                Start tracking and let Clarity monitor your attention patterns
+              </p>
+            </div>
+          </div>
 
-            <div className="flex gap-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                4
-              </div>
-              <div>
-                <h3 className="text-xl font-headline font-semibold mb-2">Review Your Progress</h3>
-                <p className="text-muted-foreground font-body">
-                  Track your focus metrics and improve your concentration over time
-                </p>
-              </div>
+          <div className="flex gap-8 items-start">
+            <div className="flex-shrink-0 w-16 h-16 rounded-full border-2 border-foreground flex items-center justify-center">
+              <span className="text-2xl font-logo font-light">3</span>
+            </div>
+            <div className="pt-3">
+              <h3 className="text-2xl font-headline font-medium mb-3 text-foreground">Stay Focused</h3>
+              <p className="text-muted-foreground font-body text-lg leading-relaxed">
+                Receive gentle alerts when your attention begins to wander
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-8 items-start">
+            <div className="flex-shrink-0 w-16 h-16 rounded-full border-2 border-foreground flex items-center justify-center">
+              <span className="text-2xl font-logo font-light">4</span>
+            </div>
+            <div className="pt-3">
+              <h3 className="text-2xl font-headline font-medium mb-3 text-foreground">Analyze Progress</h3>
+              <p className="text-muted-foreground font-body text-lg leading-relaxed">
+                Review elegant visualizations of your productivity and growth
+              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="container mx-auto px-6 py-20">
-        <div className="max-w-3xl mx-auto text-center bg-primary/5 rounded-3xl p-12">
-          <h2 className="text-4xl font-headline font-bold mb-6">Ready to Transform Your Focus?</h2>
-          <p className="text-lg font-body text-muted-foreground mb-8">
+      <section className="bg-foreground text-background py-32">
+        <div className="container mx-auto px-6 max-w-3xl text-center">
+          <h2 className="text-4xl md:text-5xl font-logo font-light mb-8">
+            Begin Your Journey
+          </h2>
+          <p className="text-lg md:text-xl text-background/80 font-body mb-12 leading-relaxed">
+            Experience the elegance of purposeful productivity
           </p>
           <Button
             onClick={handleGetStarted}
             size="lg"
-            className="font-body font-medium px-12 py-6 text-lg rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all"
+            variant="outline"
+            className="font-body font-medium px-12 py-6 text-base bg-background text-foreground hover:bg-background/90 border-background transition-all"
           >
-            Start Your Journey
+            Get Started
           </Button>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="container mx-auto px-6 py-8 text-center border-t">
-        <p className="text-sm font-body text-muted-foreground">
-          Attention analytics. Data-driven insights.
+      <footer className="container mx-auto px-6 py-12 text-center border-t border-border/50">
+        <p className="text-sm font-body text-muted-foreground tracking-wide">
+          Clarity — Attention Analytics
         </p>
       </footer>
     </div>
