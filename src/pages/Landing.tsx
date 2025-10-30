@@ -37,8 +37,8 @@ const Landing = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      {/* Hero Section - Full viewport height */}
-      <section className="min-h-screen flex flex-col items-center justify-center relative">
+      {/* Hero Section - 2/3 viewport height */}
+      <section className="h-[65vh] flex flex-col items-center justify-center relative">
         <div className="text-center">
           <h1 className="text-[6rem] md:text-[7rem] lg:text-[8rem] font-headline font-bold tracking-tight text-foreground leading-none">
             <TypingAnimation 
@@ -60,24 +60,15 @@ const Landing = () => {
       </section>
 
       {/* About Section */}
-      <section className="container mx-auto px-6 pt-8 pb-32 max-w-4xl">
+      <section className="container mx-auto px-6 pt-6 pb-24 max-w-4xl">
         <div className="space-y-8">
         <h2 className="text-4xl md:text-5xl font-headline font-semibold text-foreground text-center mb-16">
           Transform Your Attention
         </h2>
           <p className="text-xl md:text-2xl font-body text-muted-foreground leading-relaxed text-center">
-            Clarity turns your focus into valuable intelligence. Through sophisticated tracking 
-            and elegant data visualization, gain professional insights that matter.
+            Through sophisticated tracking and elegant data visualization, 
+            gain insights that matter for your productivity habits.
           </p>
-          <div className="flex justify-center pt-8">
-            <Button
-              onClick={handleGetStarted}
-              size="lg"
-              className="font-body font-medium px-12 py-6 text-base bg-primary hover:bg-primary/90 text-primary-foreground transition-all"
-            >
-              Get Started
-            </Button>
-          </div>
         </div>
       </section>
 
@@ -114,14 +105,14 @@ const Landing = () => {
             />
             <AnimatedFeatureCard
               icon={Users}
-              title="Social Competition"
+              title="Competition"
               description="Compare your focus metrics with friends on the leaderboard"
               delay={0}
             />
             <AnimatedFeatureCard
               icon={Sparkles}
               title="Smart Insights"
-              description="AI-powered recommendations help you optimize your work patterns"
+              description="Recommendations help you optimize your work patterns"
               delay={150}
             />
             <AnimatedFeatureCard
@@ -139,76 +130,17 @@ const Landing = () => {
         <AnimatedShowcase />
       </section>
 
-      {/* How It Works */}
-      <section className="container mx-auto px-6 py-32 max-w-4xl">
-        <h2 className="text-4xl md:text-5xl font-headline font-semibold text-foreground text-center mb-20">
-          How It Works
-        </h2>
-        <div className="space-y-16">
-          <div className="flex gap-8 items-start">
-            <div className="flex-shrink-0 w-16 h-16 rounded-full border-2 border-foreground flex items-center justify-center">
-              <span className="text-2xl font-headline font-semibold">1</span>
-            </div>
-            <div className="pt-3">
-              <h3 className="text-2xl font-headline font-medium mb-3 text-foreground">Create Account</h3>
-              <p className="text-muted-foreground font-body text-lg leading-relaxed">
-                Sign up and grant camera access for intelligent focus tracking
-              </p>
-            </div>
-          </div>
-
-          <div className="flex gap-8 items-start">
-            <div className="flex-shrink-0 w-16 h-16 rounded-full border-2 border-foreground flex items-center justify-center">
-              <span className="text-2xl font-headline font-semibold">2</span>
-            </div>
-            <div className="pt-3">
-              <h3 className="text-2xl font-headline font-medium mb-3 text-foreground">Begin Session</h3>
-              <p className="text-muted-foreground font-body text-lg leading-relaxed">
-                Start tracking and let Clarity monitor your attention patterns
-              </p>
-            </div>
-          </div>
-
-          <div className="flex gap-8 items-start">
-            <div className="flex-shrink-0 w-16 h-16 rounded-full border-2 border-foreground flex items-center justify-center">
-              <span className="text-2xl font-headline font-semibold">3</span>
-            </div>
-            <div className="pt-3">
-              <h3 className="text-2xl font-headline font-medium mb-3 text-foreground">Stay Focused</h3>
-              <p className="text-muted-foreground font-body text-lg leading-relaxed">
-                Receive gentle alerts when your attention begins to wander
-              </p>
-            </div>
-          </div>
-
-          <div className="flex gap-8 items-start">
-            <div className="flex-shrink-0 w-16 h-16 rounded-full border-2 border-foreground flex items-center justify-center">
-              <span className="text-2xl font-headline font-semibold">4</span>
-            </div>
-            <div className="pt-3">
-              <h3 className="text-2xl font-headline font-medium mb-3 text-foreground">Analyze Progress</h3>
-              <p className="text-muted-foreground font-body text-lg leading-relaxed">
-                Review elegant visualizations of your productivity and growth
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* CTA Section */}
-      <section className="bg-foreground text-background py-32">
+      <section className="bg-background text-foreground py-32">
         <div className="container mx-auto px-6 max-w-3xl text-center">
           <h2 className="text-4xl md:text-5xl font-headline font-semibold mb-8">
-            Begin Your Journey
+            Experience Clarity
           </h2>
-          <p className="text-lg md:text-xl text-background/80 font-body mb-12 leading-relaxed">
-            Experience the elegance of purposeful productivity
-          </p>
           <Button
             onClick={handleGetStarted}
             size="lg"
             variant="outline"
-            className="font-body font-medium px-12 py-6 text-base bg-background text-foreground hover:bg-background/90 border-background transition-all"
+            className="font-body font-medium px-12 py-6 text-base bg-background text-foreground hover:bg-foreground/90 border-background transition-all"
           >
             Get Started
           </Button>

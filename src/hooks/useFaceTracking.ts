@@ -104,25 +104,36 @@ export const useFaceTracking = () => {
   const calculateAttentionScore = (metrics: AttentionMetrics): number => {
     let score = 0;
 
-    // Face detection (40 points)
+    // Face detection (30 points - reduced from 40)
     if (metrics.faceDetected) {
-      score += 40;
+      score += 30;
     }
 
-    // Face confidence (15 points)
-    score += metrics.faceConfidence * 15;
+    // Face confidence (10 points - reduced from 15)
+    score += metrics.faceConfidence * 10;
 
-    // Head pose - looking straight at screen (30 points) - STRICT THRESHOLDS
-    if (metrics.headPoseAngle < 15) {
-      score += 30; // Looking straight
-    } else if (metrics.headPoseAngle < 25) {
-      score += 20; // Slight tilt
-    } else if (metrics.headPoseAngle < 35) {
-      score += 10; // Moderate tilt - still somewhat focused
-    } else if (metrics.headPoseAngle < 45) {
-      score += 5; // Looking away - distracted
+    // Head pose - CRITICAL COMPONENT (up to 45 points)
+    // This is now the most important factor
+    // 0° = 45 points (100% total)
+    // 15° = 25 points (80% total)
+    // 25° = 10 points (65% total, at threshold)
+    // 30° = 0 points (55% total, triggers alert)
+    const headAngle = metrics.headPoseAngle;
+    let headPosePoints = 0;
+
+    if (headAngle < 15) {
+      // 0-15°: Linear drop from 45 to 25 points
+      headPosePoints = 45 - ((headAngle / 15) * 20);
+    } else if (headAngle < 25) {
+      // 15-25°: Linear drop from 25 to 10 points
+      headPosePoints = 25 - (((headAngle - 15) / 10) * 15);
+    } else if (headAngle < 30) {
+      // 25-30°: Linear drop from 10 to 0 points
+      headPosePoints = 10 - (((headAngle - 25) / 5) * 10);
     }
-    // >45 degrees = 0 points (clearly not looking at screen)
+    // 30°+ = 0 points (triggers alert)
+
+    score += headPosePoints;
 
     // Eyes open (10 points)
     if (metrics.eyesOpen) {
@@ -134,15 +145,7 @@ export const useFaceTracking = () => {
       score += 5;
     }
 
-    // Debug logging
-    if (Math.random() < 0.1) {
-      console.log('Attention Score Debug:', {
-        total: score,
-        faceDetected: metrics.faceDetected ? 40 : 0,
-        headPoseAngle: metrics.headPoseAngle.toFixed(2),
-        eyesOpen: metrics.eyesOpen ? 10 : 0,
-      });
-    }
+    // Debug logging removed
 
     return Math.min(100, Math.max(0, score));
   };
@@ -167,7 +170,7 @@ export const useFaceTracking = () => {
     const leftDistance = Math.abs(noseTip.x - leftCheek.x);
     const rightDistance = Math.abs(noseTip.x - rightCheek.x);
     const yawRatio = Math.abs(leftDistance - rightDistance) / faceWidth;
-    const yawAngle = Math.min(45, yawRatio * 180); // 0-45 degrees
+    const yawAngle = Math.min(60, yawRatio * 120); // 0-60 degrees, less sensitive
 
     // VERTICAL DEVIATION (PITCH) - looking up/down
     // Method 1: Nose position relative to eyes
@@ -226,32 +229,14 @@ export const useFaceTracking = () => {
 
     // Combine both pitch detection methods (weighted average - favor nose position more)
     const pitchRatio = (pitchRatio1 * 0.8 + pitchRatio2 * 0.2);
-    const pitchAngle = Math.min(50, pitchRatio * 100); // Increased max angle and sensitivity
+    const pitchAngle = Math.min(60, pitchRatio * 80); // Less sensitive
 
     // COMBINED HEAD POSE ANGLE
-    // Use Euclidean distance to combine yaw and pitch
-    const combinedAngle = Math.sqrt(yawAngle * yawAngle + pitchAngle * pitchAngle);
+    // Use MAX instead of Euclidean to avoid inflating small movements
+    // This way, you need a significant turn in at least ONE direction
+    const combinedAngle = Math.max(yawAngle, pitchAngle);
 
-    // Debug logging (remove after tuning)
-    if (Math.random() < 0.1) { // Log 10% of frames to avoid spam
-      const lookingDirection =
-        deviation > 0.03 ? 'DOWN' :
-        deviation < -0.03 ? 'UP' :
-        'STRAIGHT';
-
-      console.log('Head Pose Debug:', {
-        direction: lookingDirection,
-        yawAngle: yawAngle.toFixed(2),
-        pitchAngle: pitchAngle.toFixed(2),
-        combinedAngle: combinedAngle.toFixed(2),
-        normalizedNosePos: normalizedNosePosition.toFixed(3),
-        noseDeviation: deviation.toFixed(3),
-        chinEyeRatio: chinEyeRatio.toFixed(3),
-        chinDeviation: (chinEyeRatio - BASELINE_CHIN_RATIO).toFixed(3),
-        pitchRatio1: pitchRatio1.toFixed(3),
-        pitchRatio2: pitchRatio2.toFixed(3),
-      });
-    }
+    // Debug logging removed for cleaner console
 
     return Math.min(90, combinedAngle);
   };
@@ -316,14 +301,7 @@ export const useFaceTracking = () => {
 
         const faceDetected = results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0;
 
-        // Debug: Log face detection results occasionally
-        if (frameCountRef.current % 30 === 0) {
-          console.log('Face Detection:', {
-            faceDetected,
-            landmarksCount: results.multiFaceLandmarks?.length || 0,
-            frameCount: frameCountRef.current
-          });
-        }
+        // Face detection logging removed for cleaner console
 
         let currentFocus = 0; // Default low focus when no face
         let eyeOpenness = 0;
@@ -386,7 +364,7 @@ export const useFaceTracking = () => {
         const avgFocus = Math.round(weightedSum / weightSum);
 
         // Track distraction duration - use SMOOTHED score to match what user sees
-        const DISTRACTION_THRESHOLD = 65; // Below 50% = distracted
+        const DISTRACTION_THRESHOLD = 58; // Below 50% = distracted
         let distractionDuration = 0;
 
         if (avgFocus < DISTRACTION_THRESHOLD) {

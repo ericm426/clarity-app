@@ -12,6 +12,7 @@ import { FriendProfile } from '@/components/FriendProfile';
 import { FriendshipLeaderboard } from '@/components/FriendshipLeaderboard';
 import { SmartInsights } from '@/components/SmartInsights';
 import { GoalSetting } from '@/components/GoalSetting';
+import BlockedWebsitesManager from '@/components/BlockedWebsitesManager';
 import {
   ArrowUp,
   ArrowDown,
@@ -221,6 +222,7 @@ const Dashboard = () => {
             <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
             <TabsTrigger value="insights">Smart Insights</TabsTrigger>
             <TabsTrigger value="goals">Goals</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="friends">Find Friends</TabsTrigger>
           </TabsList>
@@ -496,6 +498,18 @@ const Dashboard = () => {
 
           <TabsContent value="goals">
             <GoalSetting />
+          </TabsContent>
+
+          <TabsContent value="settings">
+            <div className="mb-8">
+              <h1 className="text-3xl font-headline font-bold text-foreground mb-2">
+                Settings
+              </h1>
+              <p className="text-sm font-body text-muted-foreground uppercase tracking-wide">
+                Manage Your Focus Tools
+              </p>
+            </div>
+            <BlockedWebsitesManager />
           </TabsContent>
 
           <TabsContent value="profile">

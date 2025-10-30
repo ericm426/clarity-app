@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clarity Focus Blocker</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 320px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #ffffff;
+      color: #1f2937;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status {
+      background: #f3f4f6;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .status-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .status-label {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .status-value {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .status-active {
+      color: #10b981;
+    }
+
+    .status-inactive {
+      color: #ef4444;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 8px;
+    }
+
+    button:last-child {
+      margin-bottom: 0;
+    }
+
+    .btn-primary {
+      background: #1f2937;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #374151;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #1f2937;
+      border: 1px solid #e5e7eb;
+    }
+
+    .btn-secondary:hover {
+      background: #f9fafb;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .info {
+      font-size: 12px;
+      color: #6b7280;
+      text-align: center;
+      margin-top: 16px;
+      line-height: 1.5;
+    }
+
+    .link {
+      color: #1f2937;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .link:hover {
+      color: #374151;
+    }
+
+    #auth-section {
+      display: none;
+    }
+
+    #auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #1f2937;
+    }
+
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">Clarity</div>
+      <div class="subtitle">Focus Blocker</div>
+    </div>
+
+    <div id="loading-section">
+      <div class="status">
+        <div class="status-row">
+          <span class="status-label">Loading...</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="main-section" style="display: none;">
+      <div class="status">
+        <div class="status-row">
+          <span class="status-label">Status</span>
+          <span id="auth-status" class="status-value">Checking...</span>
+        </div>
+        <div class="status-row">
+          <span class="status-label">Blocking</span>
+          <span id="blocking-status" class="status-value">Inactive</span>
+        </div>
+      </div>
+
+      <button id="refresh-btn" class="btn-primary">Refresh Status</button>
+      <button id="dashboard-btn" class="btn-secondary">Open Dashboard</button>
+      <button id="logout-btn" class="btn-secondary">Sign Out</button>
+
+      <div class="info">
+        Website blocking activates automatically during focus sessions.
+        Manage your blocked sites in the <span class="link" id="settings-link">Clarity dashboard</span>.
+      </div>
+    </div>
+
+    <div id="auth-section">
+      <div id="auth-error" class="error" style="display: none;"></div>
+
+      <div id="auth-form">
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button id="login-btn" class="btn-primary">Sign In</button>
+      </div>
+
+      <div class="info">
+        Don't have an account?
+        <span class="link" id="signup-link">Sign up on Clarity</span>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

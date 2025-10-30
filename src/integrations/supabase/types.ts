@@ -101,6 +101,96 @@ export type Database = {
         }
         Relationships: []
       }
+      blocked_websites: {
+        Row: {
+          id: string
+          user_id: string
+          url_pattern: string
+          name: string | null
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          url_pattern: string
+          name?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          url_pattern?: string
+          name?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      active_blocking_sessions: {
+        Row: {
+          id: string
+          user_id: string
+          focus_session_id: string | null
+          started_at: string
+          is_active: boolean
+          is_paused: boolean
+          last_heartbeat: string
+          blocked_attempts_count: number
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          focus_session_id?: string | null
+          started_at?: string
+          is_active?: boolean
+          is_paused?: boolean
+          last_heartbeat?: string
+          blocked_attempts_count?: number
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          focus_session_id?: string | null
+          started_at?: string
+          is_active?: boolean
+          is_paused?: boolean
+          last_heartbeat?: string
+          blocked_attempts_count?: number
+        }
+        Relationships: []
+      }
+      blocked_attempts: {
+        Row: {
+          id: string
+          user_id: string
+          blocking_session_id: string | null
+          url_pattern: string
+          attempted_url: string
+          attempted_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          blocking_session_id?: string | null
+          url_pattern: string
+          attempted_url: string
+          attempted_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          blocking_session_id?: string | null
+          url_pattern?: string
+          attempted_url?: string
+          attempted_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

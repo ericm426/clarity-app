@@ -3,6 +3,7 @@ import { NudgeAlert, AlertSeverity } from '@/components/NudgeAlert';
 import { CameraPreview } from '@/components/CameraPreview';
 import { ActiveSessionSidebar } from '@/components/ActiveSessionSidebar';
 import { useFaceTracking } from '@/hooks/useFaceTracking';
+import { useBlockingSession } from '@/hooks/useBlockingSession';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -11,13 +12,14 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 
 const Track = () => {
   const { isTracking, focusLevel, isFaceDetected, stream, startTracking, stopTracking, distractionCount } = useFaceTracking();
+  const [isPaused, setIsPaused] = useState(false);
+  const { isBlockingActive, startBlockingSession, stopBlockingSession } = useBlockingSession(isPaused);
   const [sessionDuration, setSessionDuration] = useState(0);
   const [showNudge, setShowNudge] = useState(false);
   const [alertSeverity, setAlertSeverity] = useState<AlertSeverity>('standard');
   const [lowFocusDuration, setLowFocusDuration] = useState(0);
   const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
   const [focusLevels, setFocusLevels] = useState<number[]>([]);
-  const [isPaused, setIsPaused] = useState(false);
   const [avgDistractions, setAvgDistractions] = useState<number | null>(null);
   const focusLevelRef = useRef(focusLevel);
   const navigate = useNavigate();
@@ -68,20 +70,22 @@ const Track = () => {
   // Auto-start session when page loads
   useEffect(() => {
     if (!isTracking) {
-      console.log('Starting tracking...');
       startTracking();
       setSessionDuration(0);
       setLowFocusDuration(0);
       setSessionStartTime(new Date());
       setFocusLevels([]);
+
+      // Start blocking session
+      startBlockingSession().then((sessionId) => {
+        if (sessionId) {
+          toast.success('Website blocking activated');
+        }
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Debug: Log stream state
-  useEffect(() => {
-    console.log('Stream state:', { stream, isTracking, streamExists: !!stream });
-  }, [stream, isTracking]);
 
   // Session timer and focus level tracking with tiered alerts
   useEffect(() => {
@@ -129,6 +133,9 @@ const Track = () => {
 
   const handleStop = async () => {
     stopTracking();
+
+    // Stop blocking session
+    await stopBlockingSession();
 
     // Save session data
     if (sessionStartTime && sessionDuration > 0) {
