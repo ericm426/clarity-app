@@ -14,7 +14,6 @@ export default {
     },
     extend: {
       fontFamily: {
-        logo: ['"Cormorant Garamond"', 'serif'],
         headline: ['"Inter Tight"', 'Inter', 'sans-serif'],
         body: ['Inter', 'sans-serif'],
         mono: ['"SF Mono"', '"JetBrains Mono"', 'monospace'],

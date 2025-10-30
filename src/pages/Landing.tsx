@@ -38,7 +38,7 @@ const Landing = () => {
       {/* Hero Section - Full viewport height */}
       <section className="min-h-screen flex flex-col items-center justify-center relative">
         <div className="text-center">
-          <h1 className="text-[8rem] md:text-[10rem] lg:text-[12rem] font-logo font-light tracking-tight text-foreground leading-none">
+          <h1 className="text-[6rem] md:text-[7rem] lg:text-[8rem] font-headline font-bold tracking-tight text-foreground leading-none">
             <TypingAnimation 
               text="Clarity" 
               delay={300}
@@ -60,9 +60,9 @@ const Landing = () => {
       {/* About Section */}
       <section className="container mx-auto px-6 py-32 max-w-4xl">
         <div className="space-y-8">
-          <h2 className="text-4xl md:text-5xl font-logo font-light text-foreground text-center mb-16">
-            Transform Your Attention
-          </h2>
+        <h2 className="text-4xl md:text-5xl font-headline font-semibold text-foreground text-center mb-16">
+          Transform Your Attention
+        </h2>
           <p className="text-xl md:text-2xl font-body text-muted-foreground leading-relaxed text-center">
             Clarity turns your focus into valuable intelligence. Through sophisticated tracking 
             and elegant data visualization, gain professional insights that matter.
@@ -124,13 +124,13 @@ const Landing = () => {
 
       {/* How It Works */}
       <section className="container mx-auto px-6 py-32 max-w-4xl">
-        <h2 className="text-4xl md:text-5xl font-logo font-light text-foreground text-center mb-20">
+        <h2 className="text-4xl md:text-5xl font-headline font-semibold text-foreground text-center mb-20">
           How It Works
         </h2>
         <div className="space-y-16">
           <div className="flex gap-8 items-start">
             <div className="flex-shrink-0 w-16 h-16 rounded-full border-2 border-foreground flex items-center justify-center">
-              <span className="text-2xl font-logo font-light">1</span>
+              <span className="text-2xl font-headline font-semibold">1</span>
             </div>
             <div className="pt-3">
               <h3 className="text-2xl font-headline font-medium mb-3 text-foreground">Create Account</h3>
@@ -142,7 +142,7 @@ const Landing = () => {
 
           <div className="flex gap-8 items-start">
             <div className="flex-shrink-0 w-16 h-16 rounded-full border-2 border-foreground flex items-center justify-center">
-              <span className="text-2xl font-logo font-light">2</span>
+              <span className="text-2xl font-headline font-semibold">2</span>
             </div>
             <div className="pt-3">
               <h3 className="text-2xl font-headline font-medium mb-3 text-foreground">Begin Session</h3>
@@ -154,7 +154,7 @@ const Landing = () => {
 
           <div className="flex gap-8 items-start">
             <div className="flex-shrink-0 w-16 h-16 rounded-full border-2 border-foreground flex items-center justify-center">
-              <span className="text-2xl font-logo font-light">3</span>
+              <span className="text-2xl font-headline font-semibold">3</span>
             </div>
             <div className="pt-3">
               <h3 className="text-2xl font-headline font-medium mb-3 text-foreground">Stay Focused</h3>
@@ -166,7 +166,7 @@ const Landing = () => {
 
           <div className="flex gap-8 items-start">
             <div className="flex-shrink-0 w-16 h-16 rounded-full border-2 border-foreground flex items-center justify-center">
-              <span className="text-2xl font-logo font-light">4</span>
+              <span className="text-2xl font-headline font-semibold">4</span>
             </div>
             <div className="pt-3">
               <h3 className="text-2xl font-headline font-medium mb-3 text-foreground">Analyze Progress</h3>
@@ -181,7 +181,7 @@ const Landing = () => {
       {/* CTA Section */}
       <section className="bg-foreground text-background py-32">
         <div className="container mx-auto px-6 max-w-3xl text-center">
-          <h2 className="text-4xl md:text-5xl font-logo font-light mb-8">
+          <h2 className="text-4xl md:text-5xl font-headline font-semibold mb-8">
             Begin Your Journey
           </h2>
           <p className="text-lg md:text-xl text-background/80 font-body mb-12 leading-relaxed">
