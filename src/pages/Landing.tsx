@@ -1,11 +1,13 @@
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { Eye, Brain, Target, Zap, ChevronDown } from 'lucide-react';
+import { Eye, Brain, Target, Zap, ChevronDown, BarChart3, Users, Sparkles } from 'lucide-react';
 import Header from '@/components/Header';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
 import { TypingAnimation } from '@/components/TypingAnimation';
+import { AnimatedFeatureCard } from '@/components/AnimatedFeatureCard';
+import { AnimatedShowcase } from '@/components/AnimatedShowcase';
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -82,44 +84,59 @@ const Landing = () => {
       {/* Features Section */}
       <section className="bg-muted/30 py-32">
         <div className="container mx-auto px-6 max-w-6xl">
-          <div className="grid md:grid-cols-3 gap-16">
-            <div className="text-center space-y-4">
-              <div className="flex justify-center mb-4">
-                <div className="w-12 h-12 rounded-full bg-foreground/5 flex items-center justify-center">
-                  <Eye className="w-6 h-6 text-foreground" />
-                </div>
-              </div>
-              <h3 className="text-xl font-headline font-medium text-foreground">Intelligent Tracking</h3>
-              <p className="text-muted-foreground font-body leading-relaxed">
-                Advanced camera-based monitoring captures your attention patterns with precision
-              </p>
-            </div>
-
-            <div className="text-center space-y-4">
-              <div className="flex justify-center mb-4">
-                <div className="w-12 h-12 rounded-full bg-foreground/5 flex items-center justify-center">
-                  <Brain className="w-6 h-6 text-foreground" />
-                </div>
-              </div>
-              <h3 className="text-xl font-headline font-medium text-foreground">Mindful Alerts</h3>
-              <p className="text-muted-foreground font-body leading-relaxed">
-                Subtle notifications guide you back when focus begins to drift
-              </p>
-            </div>
-
-            <div className="text-center space-y-4">
-              <div className="flex justify-center mb-4">
-                <div className="w-12 h-12 rounded-full bg-foreground/5 flex items-center justify-center">
-                  <Target className="w-6 h-6 text-foreground" />
-                </div>
-              </div>
-              <h3 className="text-xl font-headline font-medium text-foreground">Elegant Analytics</h3>
-              <p className="text-muted-foreground font-body leading-relaxed">
-                Clean, sophisticated dashboards reveal your productivity insights
-              </p>
-            </div>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-headline font-semibold text-foreground mb-6">
+              Powerful Features
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Everything you need to understand and improve your focus
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <AnimatedFeatureCard
+              icon={Eye}
+              title="Intelligent Tracking"
+              description="Advanced camera-based monitoring captures your attention patterns with precision"
+              delay={0}
+            />
+            <AnimatedFeatureCard
+              icon={Brain}
+              title="Mindful Alerts"
+              description="Subtle notifications guide you back when focus begins to drift"
+              delay={150}
+            />
+            <AnimatedFeatureCard
+              icon={BarChart3}
+              title="Elegant Analytics"
+              description="Clean, sophisticated dashboards reveal your productivity insights"
+              delay={300}
+            />
+            <AnimatedFeatureCard
+              icon={Users}
+              title="Social Competition"
+              description="Compare your focus metrics with friends on the leaderboard"
+              delay={0}
+            />
+            <AnimatedFeatureCard
+              icon={Sparkles}
+              title="Smart Insights"
+              description="AI-powered recommendations help you optimize your work patterns"
+              delay={150}
+            />
+            <AnimatedFeatureCard
+              icon={Target}
+              title="Goal Setting"
+              description="Set and track focus goals to build better concentration habits"
+              delay={300}
+            />
           </div>
         </div>
+      </section>
+
+      {/* Animated Showcase */}
+      <section className="container mx-auto px-6 py-32 max-w-6xl">
+        <AnimatedShowcase />
       </section>
 
       {/* How It Works */}

@@ -44,6 +44,14 @@ const Header = () => {
         </h1>
 
         <div className="flex items-center gap-3">
+          <Button
+            onClick={handleDashboardClick}
+            variant="ghost"
+            className="font-body"
+          >
+            Dashboard
+          </Button>
+          
           {user ? (
             <Button
               onClick={handleLogout}
