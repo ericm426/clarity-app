@@ -3,8 +3,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Loader2, TrendingUp, TrendingDown } from 'lucide-react';
+import { ArrowLeft, Loader2, TrendingUp, TrendingDown, UserMinus } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { toast } from 'sonner';
 
 interface Profile {
   display_name: string;
@@ -25,9 +26,12 @@ export const FriendProfile = ({ userId, onBack }: { userId: string; onBack: () =
   const [profile, setProfile] = useState<Profile | null>(null);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isFriend, setIsFriend] = useState(false);
+  const [friendshipId, setFriendshipId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchFriendData();
+    checkFriendship();
   }, [userId]);
 
   const fetchFriendData = async () => {
@@ -96,6 +100,46 @@ export const FriendProfile = ({ userId, onBack }: { userId: string; onBack: () =
     }));
   };
 
+  const checkFriendship = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data } = await supabase
+        .from('friendships')
+        .select('id')
+        .or(`and(user_id.eq.${user.id},friend_id.eq.${userId}),and(user_id.eq.${userId},friend_id.eq.${user.id})`)
+        .eq('status', 'accepted')
+        .single();
+
+      if (data) {
+        setIsFriend(true);
+        setFriendshipId(data.id);
+      }
+    } catch (error) {
+      console.error('Error checking friendship:', error);
+    }
+  };
+
+  const handleUnfriend = async () => {
+    if (!friendshipId) return;
+
+    try {
+      const { error } = await supabase
+        .from('friendships')
+        .delete()
+        .eq('id', friendshipId);
+
+      if (error) throw error;
+
+      toast.success('Friend removed');
+      onBack();
+    } catch (error) {
+      console.error('Error unfriending:', error);
+      toast.error('Failed to remove friend');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -109,10 +153,18 @@ export const FriendProfile = ({ userId, onBack }: { userId: string; onBack: () =
 
   return (
     <div className="space-y-6">
-      <Button variant="ghost" onClick={onBack} className="mb-4">
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to Friends
-      </Button>
+      <div className="flex items-center justify-between mb-4">
+        <Button variant="ghost" onClick={onBack}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Friends
+        </Button>
+        {isFriend && (
+          <Button variant="outline" onClick={handleUnfriend}>
+            <UserMinus className="mr-2 h-4 w-4" />
+            Unfriend
+          </Button>
+        )}
+      </div>
 
       <Card>
         <CardContent className="pt-6">

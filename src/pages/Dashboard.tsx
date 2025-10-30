@@ -10,6 +10,8 @@ import { Profile } from '@/components/Profile';
 import { FindFriends } from '@/components/FindFriends';
 import { FriendProfile } from '@/components/FriendProfile';
 import { FriendshipLeaderboard } from '@/components/FriendshipLeaderboard';
+import { SmartInsights } from '@/components/SmartInsights';
+import { GoalSetting } from '@/components/GoalSetting';
 import {
   ArrowUp,
   ArrowDown,
@@ -48,6 +50,7 @@ const Dashboard = () => {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewingFriendId, setViewingFriendId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('dashboard');
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -195,7 +198,13 @@ const Dashboard = () => {
       <div className="min-h-screen bg-background flex flex-col">
         <Header />
         <main className="container mx-auto px-6 py-8 flex-1 max-w-7xl">
-          <FriendProfile userId={viewingFriendId} onBack={() => setViewingFriendId(null)} />
+          <FriendProfile 
+            userId={viewingFriendId} 
+            onBack={() => {
+              setViewingFriendId(null);
+              setActiveTab('friends');
+            }} 
+          />
         </main>
       </div>
     );
@@ -206,10 +215,12 @@ const Dashboard = () => {
       <Header />
       
       <main className="container mx-auto px-6 py-8 flex-1 max-w-7xl">
-        <Tabs defaultValue="dashboard" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-8">
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
             <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
+            <TabsTrigger value="insights">Smart Insights</TabsTrigger>
+            <TabsTrigger value="goals">Goals</TabsTrigger>
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="friends">Find Friends</TabsTrigger>
           </TabsList>
@@ -477,6 +488,14 @@ const Dashboard = () => {
 
           <TabsContent value="leaderboard">
             <FriendshipLeaderboard onViewProfile={setViewingFriendId} />
+          </TabsContent>
+
+          <TabsContent value="insights">
+            <SmartInsights sessions={sessions} />
+          </TabsContent>
+
+          <TabsContent value="goals">
+            <GoalSetting />
           </TabsContent>
 
           <TabsContent value="profile">

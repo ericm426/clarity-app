@@ -25,12 +25,14 @@ export const FindFriends = ({ onViewProfile }: { onViewProfile: (userId: string)
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Profile[]>([]);
   const [friends, setFriends] = useState<Profile[]>([]);
+  const [pendingRequests, setPendingRequests] = useState<(Friendship & { profile: Profile })[]>([]);
   const [friendships, setFriendships] = useState<Friendship[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     fetchFriends();
+    fetchPendingRequests();
   }, []);
 
   const fetchFriends = async () => {
@@ -105,35 +107,156 @@ export const FindFriends = ({ onViewProfile }: { onViewProfile: (userId: string)
         .insert({
           user_id: user.id,
           friend_id: friendId,
-          status: 'accepted',
+          status: 'pending',
         });
 
       if (error) throw error;
 
       toast({
-        title: 'Friend added',
-        description: 'You are now friends!',
+        title: 'Friend request sent',
+        description: 'Waiting for them to accept.',
       });
 
-      fetchFriends();
       setSearchResults([]);
       setSearchQuery('');
     } catch (error) {
       console.error('Error adding friend:', error);
       toast({
         title: 'Error',
-        description: 'Failed to add friend.',
+        description: 'Failed to send friend request.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const fetchPendingRequests = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: requestData } = await supabase
+        .from('friendships')
+        .select('id, user_id, friend_id, status, created_at')
+        .eq('friend_id', user.id)
+        .eq('status', 'pending');
+
+      if (requestData && requestData.length > 0) {
+        const userIds = requestData.map(r => r.user_id);
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('*')
+          .in('user_id', userIds);
+
+        if (profilesData) {
+          const requestsWithProfiles = requestData.map(request => {
+            const profile = profilesData.find(p => p.user_id === request.user_id);
+            return {
+              ...request,
+              profile: profile || { id: '', user_id: request.user_id, display_name: 'Unknown', avatar_url: '', bio: '' }
+            };
+          });
+          setPendingRequests(requestsWithProfiles);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching pending requests:', error);
+    }
+  };
+
+  const handleAcceptRequest = async (friendshipId: string) => {
+    try {
+      const { error } = await supabase
+        .from('friendships')
+        .update({ status: 'accepted' })
+        .eq('id', friendshipId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Friend request accepted',
+        description: 'You are now friends!',
+      });
+
+      fetchFriends();
+      fetchPendingRequests();
+    } catch (error) {
+      console.error('Error accepting request:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to accept friend request.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleRejectRequest = async (friendshipId: string) => {
+    try {
+      const { error } = await supabase
+        .from('friendships')
+        .delete()
+        .eq('id', friendshipId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Friend request rejected',
+      });
+
+      fetchPendingRequests();
+    } catch (error) {
+      console.error('Error rejecting request:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to reject friend request.',
         variant: 'destructive',
       });
     }
   };
 
   const isFriend = (userId: string) => {
-    return friendships.some(f => f.friend_id === userId || f.status === 'accepted');
+    return friendships.some(f => (f.friend_id === userId && f.status === 'accepted'));
   };
+
 
   return (
     <div className="space-y-6">
+      {pendingRequests.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Pending Friend Requests ({pendingRequests.length})</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {pendingRequests.map((request) => (
+                <div
+                  key={request.id}
+                  className="flex items-center justify-between p-3 border rounded-lg"
+                >
+                  <div className="flex items-center gap-3">
+                    <Avatar>
+                      <AvatarImage src={request.profile.avatar_url} />
+                      <AvatarFallback>{request.profile.display_name?.charAt(0).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium">{request.profile.display_name}</p>
+                      {request.profile.bio && <p className="text-sm text-muted-foreground">{request.profile.bio}</p>}
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button size="sm" onClick={() => handleAcceptRequest(request.id)}>
+                      Accept
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => handleRejectRequest(request.id)}>
+                      Reject
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+      
       <Card>
         <CardHeader>
           <CardTitle>Search Users</CardTitle>
