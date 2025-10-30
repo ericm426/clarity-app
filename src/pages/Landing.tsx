@@ -58,7 +58,7 @@ const Landing = () => {
       </section>
 
       {/* About Section */}
-      <section className="container mx-auto px-6 py-32 max-w-4xl">
+      <section className="container mx-auto px-6 pt-8 pb-32 max-w-4xl">
         <div className="space-y-8">
         <h2 className="text-4xl md:text-5xl font-headline font-semibold text-foreground text-center mb-16">
           Transform Your Attention
