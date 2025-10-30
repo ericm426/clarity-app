@@ -302,7 +302,7 @@ const Dashboard = () => {
               <span className={stats.focusChange >= 0 ? 'text-success' : 'text-destructive'}>
                 {Math.abs(Math.round(stats.focusChange))} pts
               </span>
-              <span className="text-muted-foreground">improvement</span>
+              <span className="text-muted-foreground">{stats.focusChange >= 0 ? 'improvement' : 'decrease'}</span>
             </div>
           </Card>
 
