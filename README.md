@@ -1,4 +1,4 @@
-#Clarity App
+Clarity App
 
 A computer vision project made for the Congressional App Challenge.
 
